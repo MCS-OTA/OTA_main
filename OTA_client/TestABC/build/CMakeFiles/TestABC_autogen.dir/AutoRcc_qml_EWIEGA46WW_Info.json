@@ -1,0 +1,25 @@
+{
+	"BUILD_DIR" : "/home/pdc/OTA_client/TestABC/build/TestABC_autogen",
+	"CMAKE_BINARY_DIR" : "/home/pdc/OTA_client/TestABC/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/pdc/OTA_client/TestABC/build",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/pdc/OTA_client/TestABC",
+	"CMAKE_SOURCE_DIR" : "/home/pdc/OTA_client/TestABC",
+	"INCLUDE_DIR" : "/home/pdc/OTA_client/TestABC/build/TestABC_autogen/include",
+	"INPUTS" : 
+	[
+		"/home/pdc/OTA_client/TestABC/main.qml",
+		"/home/pdc/OTA_client/TestABC/images/aston_logo.png",
+		"/home/pdc/OTA_client/TestABC/images/aston_back.jpg",
+		"/home/pdc/OTA_client/TestABC/images/aston_front.jpg"
+	],
+	"LOCK_FILE" : "/home/pdc/OTA_client/TestABC/build/CMakeFiles/TestABC_autogen.dir/AutoRcc_qml_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "qml" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_qml.cpp",
+	"RCC_EXECUTABLE" : "/usr/lib/qt5/bin/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/home/pdc/OTA_client/TestABC/build/CMakeFiles/TestABC_autogen.dir/AutoRcc_qml_EWIEGA46WW_Used.txt",
+	"SOURCE" : "/home/pdc/OTA_client/TestABC/qml.qrc",
+	"VERBOSITY" : 0
+}
