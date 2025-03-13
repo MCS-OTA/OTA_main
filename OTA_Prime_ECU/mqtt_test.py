@@ -13,7 +13,7 @@ brokerIp = "192.168.86.67"
 port = 1883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
-topic_to_server = "option/option"
+topic_to_server = "file/current_json"
 
 unzip_path = "updateFiles"
 json_manager = JSON_manager()
@@ -34,7 +34,17 @@ def check_and_build_function(event):
             print("move_original_file_to_tmp_success")
             if json_manager.move_update_file_to_ws():
                 print("move_update_file_to_ws_success")
-                json_manager.build_update_file()
+                if json_manager.build_update_file():
+                    print("build ok")
+                else:
+                    print("build not ok, roll back")
+                    lastVersion = list(json_manager.historyList.keys())[-1]
+                    print(f"lastVersion: {lastVersion}")
+                    if json_manager.roll_back(lastVersion):
+                        print("roll back ok")
+                        json_manager.build_update_file()
+                    else:
+                        print("roll back not ok")
             else:
                 print("move_update_file_to_ws_fail")
         else:
