@@ -1,4 +1,4 @@
-// "v0.0.0"
+// "v2.0.0"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
