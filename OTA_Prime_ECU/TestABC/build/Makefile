@@ -235,6 +235,30 @@ TestABC_autogen/mocs_compilation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestABC.dir/build.make CMakeFiles/TestABC.dir/TestABC_autogen/mocs_compilation.cpp.s
 .PHONY : TestABC_autogen/mocs_compilation.cpp.s
 
+camera_backend.o: camera_backend.cpp.o
+.PHONY : camera_backend.o
+
+# target to build an object file
+camera_backend.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestABC.dir/build.make CMakeFiles/TestABC.dir/camera_backend.cpp.o
+.PHONY : camera_backend.cpp.o
+
+camera_backend.i: camera_backend.cpp.i
+.PHONY : camera_backend.i
+
+# target to preprocess a source file
+camera_backend.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestABC.dir/build.make CMakeFiles/TestABC.dir/camera_backend.cpp.i
+.PHONY : camera_backend.cpp.i
+
+camera_backend.s: camera_backend.cpp.s
+.PHONY : camera_backend.s
+
+# target to generate assembly for a file
+camera_backend.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestABC.dir/build.make CMakeFiles/TestABC.dir/camera_backend.cpp.s
+.PHONY : camera_backend.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -279,6 +303,9 @@ help:
 	@echo "... TestABC_autogen/mocs_compilation.o"
 	@echo "... TestABC_autogen/mocs_compilation.i"
 	@echo "... TestABC_autogen/mocs_compilation.s"
+	@echo "... camera_backend.o"
+	@echo "... camera_backend.i"
+	@echo "... camera_backend.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

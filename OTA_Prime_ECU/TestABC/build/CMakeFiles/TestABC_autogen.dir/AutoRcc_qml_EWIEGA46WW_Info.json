@@ -9,8 +9,8 @@
 	[
 		"/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/main.qml",
 		"/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/images/aston_logo.png",
-		"/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/images/aston_back.jpg",
-		"/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/images/aston_front.jpg"
+		"/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/images/lambo_back.jpg",
+		"/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/images/hyundai_front.jpg"
 	],
 	"LOCK_FILE" : "/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/build/CMakeFiles/TestABC_autogen.dir/AutoRcc_qml_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,

@@ -6,6 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/TestABC.dir/TestABC_autogen/EWIEGA46WW/qrc_qml.cpp.o.d"
   "CMakeFiles/TestABC.dir/TestABC_autogen/mocs_compilation.cpp.o"
   "CMakeFiles/TestABC.dir/TestABC_autogen/mocs_compilation.cpp.o.d"
+  "CMakeFiles/TestABC.dir/camera_backend.cpp.o"
+  "CMakeFiles/TestABC.dir/camera_backend.cpp.o.d"
   "CMakeFiles/TestABC.dir/main.cpp.o"
   "CMakeFiles/TestABC.dir/main.cpp.o.d"
   "TestABC"
