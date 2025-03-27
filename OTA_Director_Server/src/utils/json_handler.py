@@ -49,7 +49,7 @@ class JsonHandler:
                     max_version = version
 
         final_result = {
-            "version": "3.0.0",
+            "version": "6.6.6",
             base_dir: result
         }
         
@@ -81,6 +81,9 @@ class JsonHandler:
                 # 버전이 다르거나 경로가 다른 경우에만 update_data에 저장
                 if output_file_info["version"] != received_file_info["version"] or output_file_info["path"] != received_file_info["path"]:
                     update_data["TestABC"][filename] = output_file_info
+            else:
+                # output.json에 있고 received.json에 없는 새로운 파일 추가
+                update_data["TestABC"][filename] = output_file_info
 
         # 변경된 항목만 포함된 update_data를 update.json에 저장
         with open(update_json, "w", encoding="utf-8") as f:

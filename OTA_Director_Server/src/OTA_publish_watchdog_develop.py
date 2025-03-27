@@ -17,7 +17,8 @@ class FileHandler:
         self.files_path = files_path
         self.MQTT_NOTIFY_TOPIC = "file/added"
         self.json_from_client = "file/current_json" #option/option
-        self.permission_topic = "permission/client"
+        self.permission_to_client = "permission/client"
+        self.permission_from_client = "permission/server"
         self.rollback_ropic = "rollback"
         self.MQTT_FILE_TOPIC = "file/files"
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
@@ -56,7 +57,7 @@ class FileHandler:
     def on_connect(self, client, userdata, flags, rc, topic):
         print(f"Connected: {rc}")
         client.subscribe(self.json_from_client)
-        client.subscribe(self.permission_topic)
+        client.subscribe(self.permission_from_client)
 
     def on_message(self, client, userdata, msg):
         output_json = "../data/output.json"  # output.json 파일 경로
@@ -65,10 +66,11 @@ class FileHandler:
         src_path = "../src_add/TestABC"
         output_archive = "../data/update.tar.xz"
         # MQTT에서 받은 메시지를 출력
-        print(f"Received message: {msg.payload.decode()}")
+        
         
         # 받은 메시지를 JSON 형식으로 파싱
         if msg.topic == "file/current_json" :
+            print(f"file/current_json: {msg.payload.decode()}")
             try:
                 json_data = json.loads(msg.payload.decode())
                 # JSON 데이터를 파일로 저장
@@ -84,18 +86,19 @@ class FileHandler:
                 print(f"Failed to decode JSON: {e}")
 
             encoded_update_json = self.encode_files(update_json)
-            client.publish(self.permission_topic, encoded_files)
-            encoded_files = self.encode_files(self.files_path)
+            client.publish(self.permission_to_client, encoded_update_json)
+            print("permission to client sent")
 
+        elif msg.topic =="permission/server":
+            print("permission/client: ",msg.payload.decode())
+            if msg.payload.decode() == "0":
+                encoded_files = self.encode_files(self.files_path)
 
-        elif msg.topic =="permission":
-            if msg.payload.decode() == "1":
                 client.publish(self.MQTT_FILE_TOPIC, encoded_files)
+
             else:
                 pass
 
-        
-        print("Image sent to MQTT broker.")
 
 
 
@@ -144,6 +147,7 @@ if __name__ == "__main__":
 
     try:
         while True:
+            print("-")
             time.sleep(1)
     except KeyboardInterrupt:
         file_handler.stop_watching()
