@@ -1,17 +1,14 @@
-import paho.mqtt.client as mqtt
-import os
-import shutil
-import subprocess
+import sys
 import threading
 import time
 import base64
 import json
 import tarfile
+import paho.mqtt.client as mqtt
+from utils.OTA_GUI import show_update_gui
 from json_manage import JSON_manager
-import tkinter as tk
-from utils.OTA_GUI import OTA_GUI
 
-brokerIp = "192.168.86.67"
+brokerIp = "192.168.86.182"
 port = 1883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
@@ -21,6 +18,9 @@ topic_permission_server = "permission/server"
 unzip_path = "updateFiles"
 json_manager = JSON_manager()
 
+event = threading.Event()
+
+
 def load_updateList():
     print("load_updateList")
     with tarfile.open("received_update.tar.gz", "r:xz") as tar:
@@ -29,20 +29,6 @@ def load_updateList():
     print("load_updateList success")
 
 
-def select_time_to_update_with_gui():
-    '''
-    클래스가 중복 선언되니 나중에 확인 필요
-    '''
-    while True:
-        root = tk.Tk()
-        app = OTA_GUI(root)
-        root.mainloop()
-        if app.selected_time == 0:
-            client.publish(topic_permission_server, str(0))
-            break
-        else:
-            for _ in range(app.selected_time):
-                time.sleep(1)
 
 def check_and_build_function(event):
     while True:
@@ -75,25 +61,20 @@ def check_and_build_function(event):
         event.clear()
 
 
-
-
-
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
-    client.subscribe(topic_from_server_notify)  # Subscribe to the topic
+    client.subscribe(topic_from_server_notify)
     client.subscribe(topic_from_server_files)
     client.subscribe(topic_permission_client)
 
-# Callback function when a message is received from the broker
+
 def on_message(client, userdata, msg):
-    #print(f"Message received on topic {msg.topic}: {msg.payload.decode()}")
     if msg.topic == topic_from_server_notify:
         print("\n##### New Update Exist Notification From Server #####")
         client.publish(topic_to_server, json.dumps(json_manager.versionList))
-        print("\n##### Send Version List to Server #####")
     elif msg.topic == topic_from_server_files:
         print("\n##### New Update Files Have Arrived From Server #####")
-        try: 
+        try:
             with open("received_update.tar.gz", "wb") as f:
                 f.write(base64.b64decode(msg.payload))
             print("\n##### New Zip File Saved")
@@ -102,24 +83,39 @@ def on_message(client, userdata, msg):
             print("\n%%%%% New Zip File Save Error %%%%%")
     elif msg.topic == topic_permission_client:
         print("\n##### Server Ask For Permission #####")
-        select_time_to_update_with_gui()
+        ask_update_permission(client)
 
 
-        
-event = threading.Event()
-thread = threading.Thread(target = check_and_build_function, args=(event,), daemon = True)
-thread.start()
+def ask_update_permission(client):
+    def yes_callback():
+        print("Permission granted. Start update now.")
+        client.publish(topic_permission_server, str(0))
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
+    def no_callback(wait_time):
+        print(f"Permission denied. Will ask again in {wait_time} sec.")
+        timer = threading.Timer(wait_time, lambda: ask_update_permission(client))
+        timer.start()
 
-client.connect(brokerIp, port, 60)
+    show_update_gui(yes_callback, no_callback)
 
-client.loop_start()
 
-for i in range(2000):
-	print("#")
-	time.sleep(1)
-client.loop_stop()
-client.disconnect()
+if __name__ == "__main__":
+    # OTA Build Thread
+    build_thread = threading.Thread(target=check_and_build_function, args=(event,), daemon=True)
+    build_thread.start()
+
+    # MQTT Client
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(brokerIp, port, 60)
+    client.loop_start()
+
+    # Main thread 유지용 (대기)
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        client.loop_stop()
+        client.disconnect()
+

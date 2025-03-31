@@ -10,7 +10,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/build/TestABC_autogen/EWIEGA46WW/qrc_qml.cpp" "CMakeFiles/TestABC.dir/TestABC_autogen/EWIEGA46WW/qrc_qml.cpp.o" "gcc" "CMakeFiles/TestABC.dir/TestABC_autogen/EWIEGA46WW/qrc_qml.cpp.o.d"
   "/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/build/TestABC_autogen/mocs_compilation.cpp" "CMakeFiles/TestABC.dir/TestABC_autogen/mocs_compilation.cpp.o" "gcc" "CMakeFiles/TestABC.dir/TestABC_autogen/mocs_compilation.cpp.o.d"
-  "/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/camera_backend.cpp" "CMakeFiles/TestABC.dir/camera_backend.cpp.o" "gcc" "CMakeFiles/TestABC.dir/camera_backend.cpp.o.d"
   "/home/pdc/OTA_main/OTA_Prime_ECU/TestABC/main.cpp" "CMakeFiles/TestABC.dir/main.cpp.o" "gcc" "CMakeFiles/TestABC.dir/main.cpp.o.d"
   )
 

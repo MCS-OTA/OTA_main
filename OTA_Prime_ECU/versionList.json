@@ -1,5 +1,5 @@
 {
-    "version": "3.4.0",
+    "version": "6.1.2",
     "TestABC": {
         "qml.qrc": {
             "path": "qml.qrc",
@@ -11,11 +11,11 @@
         },
         "main.cpp": {
             "path": "main.cpp",
-            "version": "0.0.0"
+            "version": "0.1.2"
         },
         "CMakeLists.txt": {
             "path": "CMakeLists.txt",
-            "version": "0.0.0"
+            "version": "0.0.2"
         },
         "aston_front.jpg": {
             "path": "images/aston_front.jpg",
