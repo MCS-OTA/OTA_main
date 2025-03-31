@@ -1,4 +1,4 @@
-// "v0.0.1"
+// "v2.0.1"
 import QtQuick 2.12
 import QtQuick.Window 2.12
 
@@ -14,7 +14,7 @@ Window {
 
         // First image
         Image {
-            source: "./images/hyundai_front.jpg"
+            source: "./images/aston_front.jpg"
             width: 400
             height: 150
         }
@@ -28,7 +28,7 @@ Window {
 
         // Third image
         Image {
-            source: "./images/lambo_back.jpg"
+            source: "./images/aston_back.jpg"
             width: 400
             height: 150
         }

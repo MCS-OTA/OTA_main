@@ -1,38 +1,94 @@
-import tkinter as tk
-from tkinter import messagebox
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QLabel, QPushButton,
+    QVBoxLayout, QHBoxLayout, QMessageBox, QDialog
+)
+from PyQt5.QtCore import QTimer
+import sys
 
-class OTA_GUI:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Update Alarm")
-        self.root.geometry("300x150")
-        self.selected_time = None 
 
-        tk.Label(root, text="New Update has arrived.\nUpdate Now?", font=("Arial", 12)).pack(pady=10)
+class NoDialog(QDialog):
+    def __init__(self, parent=None):
+        super(NoDialog, self).__init__(parent)
+        self.setWindowTitle("Next Update Alarm")
+        self.setFixedSize(300, 200)
+        self.selected_time = None
 
-        tk.Button(root, text="Yes", command=self.on_yes_click, width=10).pack(side="left", padx=20, pady=10)
-        tk.Button(root, text="No", command=self.on_no_click, width=10).pack(side="right", padx=20, pady=10)
+        layout = QVBoxLayout()
+        label = QLabel("Next Update Time:")
+        layout.addWidget(label)
+
+        self.time_options = {
+            "5 sec": 5,
+            "1 Hour": 3600,
+            "1 Day": 86400,
+            "1 Week": 604800
+        }
+
+        for text, value in self.time_options.items():
+            btn = QPushButton(text)
+            btn.clicked.connect(lambda checked, v=value, t=text: self.confirm_selection(v, t))
+            layout.addWidget(btn)
+
+        self.setLayout(layout)
+
+    def confirm_selection(self, value, text):
+        self.selected_time = value
+        QMessageBox.information(self, "Confirmed", f"Next alarm will be in {text}.")
+        self.accept()
+
+
+class OTA_GUI(QWidget):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.selected_time = None
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("Update Alarm")
+        self.setFixedSize(300, 150)
+
+        layout = QVBoxLayout()
+        label = QLabel("New Update has arrived.\nUpdate Now?")
+        layout.addWidget(label)
+
+        button_layout = QHBoxLayout()
+
+        yes_btn = QPushButton("Yes")
+        yes_btn.clicked.connect(self.on_yes_click)
+        button_layout.addWidget(yes_btn)
+
+        no_btn = QPushButton("No")
+        no_btn.clicked.connect(self.on_no_click)
+        button_layout.addWidget(no_btn)
+
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
 
     def on_yes_click(self):
-        messagebox.showinfo("Start Update Now", "Start Update Now")
-        self.selected_time = 0
-        self.root.destroy()
+        QMessageBox.information(self, "Start Update Now", "Start Update Now")
+        print("Update Now!")
+        self.app.quit()
 
     def on_no_click(self):
-        no_window = tk.Toplevel(self.root)
-        no_window.title("Next Update Alarm")
-        no_window.geometry("300x200")
+        dialog = NoDialog(self)
+        if dialog.exec_():
+            wait_time = dialog.selected_time
+            print(f"Wait {wait_time} sec until next alarm...")
+            QTimer.singleShot(wait_time * 1000, self.show_again)
+            self.close()
 
-        tk.Label(no_window, text="Next Update Time:", font=("Arial", 10)).pack(pady=10)
+    def show_again(self):
+        new_gui = OTA_GUI(self.app)
+        new_gui.show()
 
-        time_options = {"5 sec": 5, "1 Hour": 3600, "1 Day": 86400, "1 Week": 604800}
 
-        def confirm_selection(value):
-            self.selected_time = value
-            messagebox.showinfo("Confirmed", f"Next alarm will be in {list(time_options.keys())[list(time_options.values()).index(value)]}.")
-            no_window.destroy()
-            self.root.destroy()
-        for text, value in time_options.items():
-            tk.Button(no_window, text=text, command=lambda v=value: confirm_selection(v), width=15).pack(pady=5)
-        tk.Button(no_window, text="확인", command=confirm_selection).pack(pady=10)
+def main():
+    app = QApplication(sys.argv)
+    gui = OTA_GUI(app)
+    gui.show()
+    sys.exit(app.exec_())
 
+
+if __name__ == "__main__":
+    main()

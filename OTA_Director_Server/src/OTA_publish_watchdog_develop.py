@@ -128,7 +128,7 @@ class FileChangeHandler(FileSystemEventHandler):
 # 사용 예시
 if __name__ == "__main__":
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.67"  # 또는 MQTT 서버 IP
+    MQTT_BROKER = "192.168.86.182"  # 또는 MQTT 서버 IP
     MQTT_PORT = 1883
 
     # 감시할 디렉토리 설정

@@ -1,32 +1,32 @@
 {
     "version": "6.6.6",
     "TestABC": {
-        "qml.qrc": {
-            "path": "qml.qrc",
-            "version": "1.0.1"
-        },
-        "main.qml": {
-            "path": "main.qml",
-            "version": "2.0.1"
-        },
-        "main.cpp": {
-            "path": "main.cpp",
-            "version": "20.4.1"
-        },
         "CMakeLists.txt": {
             "path": "CMakeLists.txt",
             "version": "0.0.0"
         },
-        "aston_front.jpg": {
-            "path": "images/aston_front.jpg",
+        "main.cpp": {
+            "path": "main.cpp",
             "version": "0.0.0"
+        },
+        "main.qml": {
+            "path": "main.qml",
+            "version": "0.0.1"
+        },
+        "qml.qrc": {
+            "path": "qml.qrc",
+            "version": "0.0.1"
         },
         "aston_logo.png": {
             "path": "images/aston_logo.png",
             "version": "0.0.0"
         },
-        "aston_back.jpg": {
-            "path": "images/aston_back.jpg",
+        "hyundai_front.jpg": {
+            "path": "images/hyundai_front.jpg",
+            "version": "0.0.0"
+        },
+        "lambo_back.jpg": {
+            "path": "images/lambo_back.jpg",
             "version": "0.0.0"
         }
     }
