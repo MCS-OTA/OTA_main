@@ -1,9 +1,7 @@
 from PyQt5.QtWidgets import (
-    QApplication, QWidget, QLabel, QPushButton,
-    QVBoxLayout, QHBoxLayout, QMessageBox, QDialog
+    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QDialog
 )
 from PyQt5.QtCore import QTimer
-import sys
 
 
 class NoDialog(QDialog):
@@ -42,6 +40,8 @@ class OTA_GUI(QWidget):
         super().__init__()
         self.app = app
         self.selected_time = None
+        self.on_yes_callback = None
+        self.on_no_callback = None
         self.init_ui()
 
     def init_ui(self):
@@ -67,28 +67,14 @@ class OTA_GUI(QWidget):
 
     def on_yes_click(self):
         QMessageBox.information(self, "Start Update Now", "Start Update Now")
-        print("Update Now!")
-        self.app.quit()
+        if self.on_yes_callback:
+            self.on_yes_callback()
+        self.close()
 
     def on_no_click(self):
         dialog = NoDialog(self)
         if dialog.exec_():
             wait_time = dialog.selected_time
-            print(f"Wait {wait_time} sec until next alarm...")
-            QTimer.singleShot(wait_time * 1000, self.show_again)
+            if self.on_no_callback:
+                self.on_no_callback(wait_time)
             self.close()
-
-    def show_again(self):
-        new_gui = OTA_GUI(self.app)
-        new_gui.show()
-
-
-def main():
-    app = QApplication(sys.argv)
-    gui = OTA_GUI(app)
-    gui.show()
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
