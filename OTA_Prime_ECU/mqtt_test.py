@@ -1,17 +1,17 @@
-import sys
+import paho.mqtt.client as mqtt
+import os
+import shutil
+import subprocess
 import threading
 import time
 import base64
 import json
 import tarfile
-import paho.mqtt.client as mqtt
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QTimer, QObject, pyqtSignal
-
-from utils.OTA_GUI import OTA_GUI
 from json_manage import JSON_manager
+import tkinter as tk
+from utils.OTA_GUI import OTA_GUI
 
-brokerIp = "192.168.86.182"
+brokerIp = "192.168.86.67"
 port = 1883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
@@ -21,9 +21,6 @@ topic_permission_server = "permission/server"
 unzip_path = "updateFiles"
 json_manager = JSON_manager()
 
-event = threading.Event()
-
-
 def load_updateList():
     print("load_updateList")
     with tarfile.open("received_update.tar.gz", "r:xz") as tar:
@@ -32,89 +29,97 @@ def load_updateList():
     print("load_updateList success")
 
 
+def select_time_to_update_with_gui():
+    '''
+    클래스가 중복 선언되니 나중에 확인 필요
+    '''
+    while True:
+        root = tk.Tk()
+        app = OTA_GUI(root)
+        root.mainloop()
+        if app.selected_time == 0:
+            client.publish(topic_permission_server, str(0))
+            break
+        else:
+            for _ in range(app.selected_time):
+                time.sleep(1)
+
 def check_and_build_function(event):
     while True:
         event.wait()
         print("\n##### Load Update List #####")
         load_updateList()
-        # (생략) 기존 파일 이동 및 빌드 작업
+        if json_manager.move_original_file_to_tmp():
+            print("\n##### Move Original Files to Tmp Success #####")
+            if json_manager.move_update_file_to_ws():
+                print("\n##### Move Update Files to Workspace Success #####")
+                if json_manager.build_update_file(rollback=False):
+                    print("\n##### Build Success #####")
+                else:
+                    print("\n%%%%% Build Failed, Try Roll Back %%%%%")
+                    lastVersion = list(json_manager.historyList.keys())[-1]
+                    print(f"\n##### Latest Version Found, Latest Version: {lastVersion}")
+                    if json_manager.roll_back(lastVersion):
+                        print(f"\n##### Roll Back Success, Roll Back to {lastVersion} Version #####")
+                        if json_manager.build_update_file(rollback=True):
+                            print("\n##### Roll Back Build Success #####")
+                        else:
+                            print("\n%%%%% Roll Back Build Failed %%%%%")
+                    else:
+                        print("\n%%%%% Roll Back Failed %%%%%")
+            else:
+                print("\n%%%%% Move Update Files to Workspace Failed %%%%%")
+        else:
+            print("\n%%%%% Move Original Files to Tmp Failed %%%%%")
         time.sleep(5)
         event.clear()
 
 
-class MessageHandler(QObject):
-    show_gui_signal = pyqtSignal()
-
-    def __init__(self):
-        super().__init__()
 
 
-def mqtt_thread_function(handler):
-    def on_connect(client, userdata, flags, rc):
-        print(f"Connected with result code {rc}")
-        client.subscribe(topic_from_server_notify)
-        client.subscribe(topic_from_server_files)
-        client.subscribe(topic_permission_client)
 
-    def on_message(client, userdata, msg):
-        if msg.topic == topic_from_server_notify:
-            print("\n##### New Update Exist Notification From Server #####")
-            client.publish(topic_to_server, json.dumps(json_manager.versionList))
-        elif msg.topic == topic_from_server_files:
-            print("\n##### New Update Files Have Arrived From Server #####")
-            try:
-                with open("received_update.tar.gz", "wb") as f:
-                    f.write(base64.b64decode(msg.payload))
-                print("\n##### New Zip File Saved")
-                event.set()
-            except:
-                print("\n%%%%% New Zip File Save Error %%%%%")
-        elif msg.topic == topic_permission_client:
-            print("\n##### Server Ask For Permission #####")
-            handler.show_gui_signal.emit()
+def on_connect(client, userdata, flags, rc):
+    print(f"Connected with result code {rc}")
+    client.subscribe(topic_from_server_notify)  # Subscribe to the topic
+    client.subscribe(topic_from_server_files)
+    client.subscribe(topic_permission_client)
 
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(brokerIp, port, 60)
-    client.loop_forever()
+# Callback function when a message is received from the broker
+def on_message(client, userdata, msg):
+    #print(f"Message received on topic {msg.topic}: {msg.payload.decode()}")
+    if msg.topic == topic_from_server_notify:
+        print("\n##### New Update Exist Notification From Server #####")
+        client.publish(topic_to_server, json.dumps(json_manager.versionList))
+        print("\n##### Send Version List to Server #####")
+    elif msg.topic == topic_from_server_files:
+        print("\n##### New Update Files Have Arrived From Server #####")
+        try: 
+            with open("received_update.tar.gz", "wb") as f:
+                f.write(base64.b64decode(msg.payload))
+            print("\n##### New Zip File Saved")
+            event.set()
+        except:
+            print("\n%%%%% New Zip File Save Error %%%%%")
+    elif msg.topic == topic_permission_client:
+        print("\n##### Server Ask For Permission #####")
+        select_time_to_update_with_gui()
 
 
-def show_update_gui(client, app):
-    gui = OTA_GUI(app)
+        
+event = threading.Event()
+thread = threading.Thread(target = check_and_build_function, args=(event,), daemon = True)
+thread.start()
 
-    def yes_action():
-        print("Permission granted. Start update now.")
-        client.publish(topic_permission_server, str(0))
-        app.quit()
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
 
-    def no_action(wait_time):
-        print(f"Permission denied. Will ask again in {wait_time} sec.")
-        QTimer.singleShot(wait_time * 1000, lambda: show_update_gui(client, app))
-        gui.close()
+client.connect(brokerIp, port, 60)
 
-    gui.on_yes_callback = yes_action
-    gui.on_no_callback = no_action
-    gui.show()
+client.loop_start()
 
-
-def main():
-    app = QApplication(sys.argv)
-    handler = MessageHandler()
-
-    # OTA Build Thread
-    build_thread = threading.Thread(target=check_and_build_function, args=(event,), daemon=True)
-    build_thread.start()
-
-    # MQTT Thread
-    mqtt_thread = threading.Thread(target=mqtt_thread_function, args=(handler,), daemon=True)
-    mqtt_thread.start()
-
-    # Signal 연결
-    handler.show_gui_signal.connect(lambda: show_update_gui(mqtt_thread_function.client, app))
-
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()
+for i in range(2000):
+	print("#")
+	time.sleep(1)
+client.loop_stop()
+client.disconnect()
