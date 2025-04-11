@@ -26,7 +26,9 @@ class JsonHandler:
         result = {}
         base_dir = os.path.basename(root_dir)
         max_version = "0.0.0"
-        
+        num_file = 0
+        image_files = {}
+
         for dirpath, _, filenames in os.walk(root_dir):
             if "build" in dirpath.split(os.sep):
                 continue
@@ -38,27 +40,33 @@ class JsonHandler:
                 rel_path = os.path.relpath(os.path.join(dirpath, filename), root_dir)
                 file_path = os.path.join(dirpath, filename)
                 
-                if filename.lower().endswith(".jpg"):
-                    version = "0.0.0"
+                if filename.lower().endswith((".jpg", ".png", ".svg")):
+                    image_files[filename] = {"fpath": rel_path, "fname": filename}
+                    
                 else:
-                    version = self.extract_version_from_text(file_path)
-                
+                    try:
+                        version = self.extract_version_from_text(file_path)
+                        num_file += 1
+                    except:
+                        print("extract version from text error : ", file_path)
                 result[filename] = {"path": rel_path, "version": version}
                 
                 if self.compare_versions(version, max_version):
                     max_version = version
 
+        for img in image_files:
+            result[img] = {"path": image_files[img]["fpath"], "version": max_version}
+
         final_result = {
-            "version": "6.6.6",
+            "version": max_version,
             base_dir: result
         }
         
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(final_result, f, indent=4, ensure_ascii=False)
+        print("total number of files : ",num_file)
 
-    
-    
-    def compare_and_update_json(self, output_json, received_json, update_json):
+    def compare_and_update_json(self, output_json, received_json, target_dir, update_json):
         # output.json을 읽어들입니다
         with open(output_json, "r", encoding="utf-8") as f:
             output_data = json.load(f)
@@ -70,20 +78,20 @@ class JsonHandler:
         # output_data와 received_data 비교하여 변경된 항목만 남깁니다.
         update_data = {
             "version": output_data["version"],  # output.json의 version을 그대로 유지
-            "TestABC": {}
+            target_dir: {}
         }
 
-        # 'TestABC' 항목 비교
-        for filename, output_file_info in output_data["TestABC"].items():
-            if filename in received_data["TestABC"]:
-                received_file_info = received_data["TestABC"][filename]
+        # 업데이트 디렉터리 항목 비교
+        for filename, output_file_info in output_data[target_dir].items():
+            if filename in received_data[target_dir]:
+                received_file_info = received_data[target_dir][filename]
                 
                 # 버전이 다르거나 경로가 다른 경우에만 update_data에 저장
                 if output_file_info["version"] != received_file_info["version"] or output_file_info["path"] != received_file_info["path"]:
-                    update_data["TestABC"][filename] = output_file_info
+                    update_data[target_dir][filename] = output_file_info
             else:
                 # output.json에 있고 received.json에 없는 새로운 파일 추가
-                update_data["TestABC"][filename] = output_file_info
+                update_data[target_dir][filename] = output_file_info
 
         # 변경된 항목만 포함된 update_data를 update.json에 저장
         with open(update_json, "w", encoding="utf-8") as f:
@@ -98,7 +106,7 @@ class JsonHandler:
             update_data = json.load(f)
         
         # 업데이트할 파일 목록 가져오기
-        base_dir = list(update_data.keys())[1]  # "TestABC" 같은 루트 키 가져오기
+        base_dir = list(update_data.keys())[1]  # "IC_someip" 같은 루트 키 가져오기
         file_entries = update_data[base_dir]  # 변경된 파일 정보
         
         # update_files 폴더 생성

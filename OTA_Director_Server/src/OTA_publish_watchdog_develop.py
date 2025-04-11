@@ -15,12 +15,21 @@ class FileHandler:
         self.MQTT_PORT = mqtt_port
         self.WATCH_DIR = watch_dir
         self.files_path = files_path
+
         self.MQTT_NOTIFY_TOPIC = "file/added"
         self.json_from_client = "file/current_json" #option/option
         self.permission_to_client = "permission/client"
         self.permission_from_client = "permission/server"
         self.rollback_ropic = "rollback"
         self.MQTT_FILE_TOPIC = "file/files"
+
+        self.output_json = "../data/output.json"  # output.json 파일 경로
+        self.received_json = "../data/received.json"  # received_data.json 파일 경로
+        self.update_json = "../data/update.json"
+        self.target_path = "../src_add/"
+        self.output_archive = "../data/update.tar.xz"
+
+
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         
         # MQTT 설정
@@ -60,33 +69,34 @@ class FileHandler:
         client.subscribe(self.permission_from_client)
 
     def on_message(self, client, userdata, msg):
-        output_json = "../data/output.json"  # output.json 파일 경로
-        received_json = "../data/received.json"  # received_data.json 파일 경로
-        update_json = "../data/update.json"
-        src_path = "../src_add/TestABC"
-        output_archive = "../data/update.tar.xz"
-        # MQTT에서 받은 메시지를 출력
-        
-        
         # 받은 메시지를 JSON 형식으로 파싱
         if msg.topic == "file/current_json" :
             print(f"file/current_json: {msg.payload.decode()}")
             try:
                 json_data = json.loads(msg.payload.decode())
+                keys = list(json_data.keys())
+
+                if len(keys) >= 2:
+                    target_dir = keys[1]
+                    final_target_path = os.path.join(self.target_path, target_dir)
                 # JSON 데이터를 파일로 저장
                 with open("../data/received.json", "w", encoding="utf-8") as json_file:
                     json.dump(json_data, json_file, indent=4, ensure_ascii=False)
                 print("Data saved to '../data/received.json'.")
 
-                self.json_handler.compare_and_update_json(output_json, received_json, update_json)
-                self.json_handler.create_update_tarball(update_json, src_path, output_archive)
-
+                self.json_handler.compare_and_update_json(self.output_json, self.received_json, target_dir, self.update_json)
+                self.json_handler.create_update_tarball(self.update_json, final_target_path, self.output_archive)
 
             except json.JSONDecodeError as e:
                 print(f"Failed to decode JSON: {e}")
 
-            encoded_update_json = self.encode_files(update_json)
-            client.publish(self.permission_to_client, encoded_update_json)
+            encoded_update_json = self.encode_files(self.update_json)
+            try:
+                result = client.publish(self.permission_to_client, encoded_update_json, qos=1, retain=True)
+                print("Pulbilsh result:  ", result.rc)
+
+            except:
+                print("PUB FAIL")
             print("permission to client sent")
 
         elif msg.topic =="permission/server":
@@ -95,12 +105,10 @@ class FileHandler:
                 encoded_files = self.encode_files(self.files_path)
 
                 client.publish(self.MQTT_FILE_TOPIC, encoded_files)
+                client.publish(self.permission_to_client, "0", qos=1, retain=True)
 
             else:
                 pass
-
-
-
 
 class FileChangeHandler(FileSystemEventHandler):
     def __init__(self, client, mqtt_notify_topic, watch_dir):
@@ -123,12 +131,10 @@ class FileChangeHandler(FileSystemEventHandler):
             self.json_handler.target_to_json(event.src_path, "../data/output.json")
             print("directory_to_json executed.")
 
-
-
 # 사용 예시
 if __name__ == "__main__":
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.182"  # 또는 MQTT 서버 IP
+    MQTT_BROKER = "192.168.86.30"  # 또는 MQTT 서버 IP
     MQTT_PORT = 1883
 
     # 감시할 디렉토리 설정
