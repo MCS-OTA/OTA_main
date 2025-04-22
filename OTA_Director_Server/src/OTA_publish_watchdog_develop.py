@@ -8,6 +8,7 @@ import base64
 import tarfile
 import shutil
 from utils.json_handler import JsonHandler
+from utils.signature.pub_signature import make_signature_file
 
 class FileHandler:
     def __init__(self, mqtt_broker, mqtt_port, watch_dir, files_path):
@@ -90,9 +91,10 @@ class FileHandler:
             except json.JSONDecodeError as e:
                 print(f"Failed to decode JSON: {e}")
 
-            encoded_update_json = self.encode_files(self.update_json)
+            #update_message = self.encode_files(self.update_json)
+            update_message = make_signature_file(self.update_json)
             try:
-                result = client.publish(self.permission_to_client, encoded_update_json, qos=1, retain=True)
+                result = client.publish(self.permission_to_client, update_message, qos=1, retain=True)
                 print("Pulbilsh result:  ", result.rc)
 
             except:
