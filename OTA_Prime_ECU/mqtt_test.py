@@ -6,9 +6,10 @@ import json
 import tarfile
 import paho.mqtt.client as mqtt
 from utils.OTA_GUI import show_update_gui
+from utils.signature.sub_signature import verify_signature
 from json_manage import JSON_manager
 
-brokerIp = "192.168.86.182"
+brokerIp = "192.168.86.30"
 port = 1883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
@@ -71,6 +72,13 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     if msg.topic == topic_from_server_notify:
         print("\n##### New Update Exist Notification From Server #####")
+        payload_target = msg.payload.decode('utf-8')
+        data = json.loads(payload_target)
+        if "directory" in data:
+            json_manager.check_target_is_new(data["directory"])
+        else:
+            print("\n%%%%% There is No Target Name in MQTT MSG %%%%%")
+            return
         client.publish(topic_to_server, json.dumps(json_manager.versionList))
     elif msg.topic == topic_from_server_files:
         print("\n##### New Update Files Have Arrived From Server #####")
@@ -82,8 +90,16 @@ def on_message(client, userdata, msg):
         except:
             print("\n%%%%% New Zip File Save Error %%%%%")
     elif msg.topic == topic_permission_client:
-        print("\n##### Server Ask For Permission #####")
-        ask_update_permission(client)
+        if msg.payload.decode('utf-8') == "0":
+            pass
+        else:
+            if verify_signature(msg.payload):
+                print("\n##### Server Ask For Permission #####")
+                ask_update_permission(client)
+            else:
+                print("\n##### Verification Fail #####")
+    else:
+        print("invalid topic")
 
 
 def ask_update_permission(client):
