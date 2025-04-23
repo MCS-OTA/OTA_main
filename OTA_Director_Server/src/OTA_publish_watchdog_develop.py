@@ -8,7 +8,8 @@ import base64
 import tarfile
 import shutil
 from utils.json_handler import JsonHandler
-from utils.signature.pub_signature import make_signature_file
+from utils.signature.pub_signature import make_payload_with_signature
+from utils.signature.sub_signature import verify_signature
 
 class FileHandler:
     def __init__(self, mqtt_broker, mqtt_port, watch_dir, files_path):
@@ -70,47 +71,65 @@ class FileHandler:
         client.subscribe(self.permission_from_client)
 
     def on_message(self, client, userdata, msg):
-        # 받은 메시지를 JSON 형식으로 파싱
-        if msg.topic == "file/current_json" :
-            print(f"file/current_json: {msg.payload.decode()}")
-            try:
-                json_data = json.loads(msg.payload.decode())
-                keys = list(json_data.keys())
+        if verify_signature(msg.payload):
+            payload_data = json.loads(msg.payload.decode('utf-8'))
+            
+            if msg.topic == "file/current_json" :
+                print(f"file/current_json: {msg.payload.decode()}")
+                try:
+                    json_data = json.loads(msg.payload.decode())
+                    keys = list(json_data.keys())
 
-                if len(keys) >= 2:
-                    target_dir = keys[1]
-                    final_target_path = os.path.join(self.target_path, target_dir)
-                # JSON 데이터를 파일로 저장
-                with open("../data/received.json", "w", encoding="utf-8") as json_file:
-                    json.dump(json_data, json_file, indent=4, ensure_ascii=False)
-                print("Data saved to '../data/received.json'.")
+                    if len(keys) >= 4:
+                        target_dir = keys[1]
+                        final_target_path = os.path.join(self.target_path, target_dir)
+                    # JSON 데이터를 파일로 저장
+                    with open("../data/received.json", "w", encoding="utf-8") as json_file:
+                        json.dump(json_data, json_file, indent=4, ensure_ascii=False)
+                    print("Data saved to '../data/received.json'.")
 
-                self.json_handler.compare_and_update_json(self.output_json, self.received_json, target_dir, self.update_json)
-                self.json_handler.create_update_tarball(self.update_json, final_target_path, self.output_archive)
+                    self.json_handler.compare_and_update_json(self.output_json, self.received_json, target_dir, self.update_json)
+                    self.json_handler.create_update_tarball(self.update_json, final_target_path, self.output_archive)
 
-            except json.JSONDecodeError as e:
-                print(f"Failed to decode JSON: {e}")
+                except json.JSONDecodeError as e:
+                    print(f"Failed to decode JSON: {e}")
 
-            #update_message = self.encode_files(self.update_json)
-            update_message = make_signature_file(self.update_json)
-            try:
-                result = client.publish(self.permission_to_client, update_message, qos=1, retain=True)
-                print("Pulbilsh result:  ", result.rc)
+                print("=" * 50, "\n\n", "Transfer Update List")
+                #update_message = self.encode_files(self.update_json)
 
-            except:
-                print("PUB FAIL")
-            print("permission to client sent")
+                with open(self.update_json, "r") as f:
+                    message = json.load(f)
 
-        elif msg.topic =="permission/server":
-            print("permission/client: ",msg.payload.decode())
-            if msg.payload.decode() == "0":
-                encoded_files = self.encode_files(self.files_path)
+                message["reset"] = False
+                update_payload = make_payload_with_signature(message)
 
-                client.publish(self.MQTT_FILE_TOPIC, encoded_files)
-                client.publish(self.permission_to_client, "0", qos=1, retain=True)
+                try:
+                    result = client.publish(self.permission_to_client, update_payload, qos=1, retain=True)
+                    print("Pulbilsh result:  ", result.rc)
 
-            else:
-                pass
+                except:
+                    print("PUB FAIL")
+                print("permission to client sent")
+
+            elif msg.topic =="permission/server":
+                print("permission/client: ",payload_data["update"])
+                if payload_data["update"]:
+                    print("=" * 50, "\n\n", "Update New Files")
+                    encoded_files = self.encode_files(self.files_path)
+                    file_message = {"encoded_files": encoded_files.decode()}
+                    file_payload = make_payload_with_signature(file_message)
+                    
+                    client.publish(self.MQTT_FILE_TOPIC, file_payload)
+                    
+                    print("=" * 50, "\n\n", "Reset the Broker")
+                    reset_payload = make_payload_with_signature({"reset": True})
+                    client.publish(self.permission_to_client, reset_payload, qos=1, retain=True)
+
+                else:
+                    pass
+
+        else:
+            print("\n##### Verification Fail #####")
 
 class FileChangeHandler(FileSystemEventHandler):
     def __init__(self, client, mqtt_notify_topic, watch_dir):
@@ -125,8 +144,12 @@ class FileChangeHandler(FileSystemEventHandler):
             print(f"New directory detected: {foldername}")
 
             # MQTT 메시지 전송
-            message = json.dumps({"event": "directory_added", "directory": foldername})
-            self.client.publish(self.MQTT_NOTIFY_TOPIC, message)
+            # message = json.dumps({"event": "directory_added", "directory": foldername})
+            print("=" * 50, "\n\n", "Notify New Update")
+            message = {"event": "directory_added", "directory": foldername}
+            notify_payload = make_payload_with_signature(message)
+
+            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload)
 
             # 디렉토리 내부의 파일들을 JSON으로 저장
             print(f"Running directory_to_json for {event.src_path}")

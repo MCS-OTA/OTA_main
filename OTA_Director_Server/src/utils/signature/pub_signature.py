@@ -21,20 +21,16 @@ def on_publish(client,userdata,mid):
 def get_current_utc_time():
     return datetime.now(timezone.utc).isoformat()
 
-def make_signature_file(raw_file):
-    with open(raw_file, "r") as f:
-        data = json.load(f)
-
+def make_payload_with_signature(data):
     data["timestamp"] = get_current_utc_time()
     message = json.dumps(data, sort_keys=True).encode()
 
-    sk = SigningKey.from_pem(open("./utils/signature/private.pem").read())
+    sk = SigningKey.from_pem(open("./utils/signature/private_backend.pem").read())
     signature = sk.sign(message)
 
     data["signature"] = base64.b64encode(signature).decode()
 
-    with open("../data/signed_update.json", "w") as f:
-        json.dump(data, f, indent=4)
+    print("Payload:     ", data, "\n\n", "=" * 50)
 
     return json.dumps(data)
 
