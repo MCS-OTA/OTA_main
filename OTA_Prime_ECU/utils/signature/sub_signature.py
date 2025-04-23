@@ -47,14 +47,14 @@ def verify_signature(payload):
         print("message = ", message)
         signature = base64.b64decode(signature_b64)
         
-        with open("./utils/signature/public.pem", "rb") as f:
+        with open("./utils/signature/public_backend.pem", "rb") as f:
             vk = VerifyingKey.from_pem(f.read())
 
         try:
             vk.verify(signature, message)
-            print("Signature verified successfully.")
+            print("\n##### Signature verified successfully. #####")
         except BadSignatureError:
-            print("Signature verification failed: Bad signature.")
+            print("\n%%%%%% Signature verification failed: Bad signature. %%%%%")
         
         print("Received message:", message)
 
