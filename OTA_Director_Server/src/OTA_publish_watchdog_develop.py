@@ -7,6 +7,8 @@ from watchdog.events import FileSystemEventHandler
 import base64
 import tarfile
 import shutil
+import ssl
+import hashlib
 from utils.json_handler import JsonHandler
 from utils.signature.pub_signature import make_payload_with_signature
 from utils.signature.sub_signature import verify_signature
@@ -31,8 +33,12 @@ class FileHandler:
         self.target_path = "../src_add/"
         self.output_archive = "../data/update.tar.xz"
 
+        self.ca_cert = "./utils/certs/ca.crt"
+        self.client_cert = "./utils/certs/client.crt"
+        self.client_key = "./utils/certs/client.key"
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
         
         # MQTT 설정
         self.client.on_connect = self.on_connect
@@ -69,6 +75,18 @@ class FileHandler:
         print(f"Connected: {rc}")
         client.subscribe(self.json_from_client)
         client.subscribe(self.permission_from_client)
+
+        try:
+            session = client._sock
+            if session:
+                tls_session = session.session
+                session_id = client._sock.session.id  # type: bytes
+                session_hash = hashlib.sha256(session_id).hexdigest()
+
+                print(f"🔐 TLS Session ID: {tls_session.id.hex()}")
+                print(f"🔐 TLS Session ID: {session_id}     ID Hash: {session_hash}")
+        except Exception as e:
+            print(f"⚠️ Failed to retrieve session ID: {e}")
 
     def on_message(self, client, userdata, msg):
         if verify_signature(msg.payload):
@@ -156,11 +174,20 @@ class FileChangeHandler(FileSystemEventHandler):
             self.json_handler.target_to_json(event.src_path, "../data/output.json")
             print("directory_to_json executed.")
 
+def configure_tls(client, ca_cert, client_cert, client_key):
+    client.tls_set(
+        ca_certs= ca_cert,
+        certfile= client_cert,
+        keyfile= client_key,
+        tls_version=ssl.PROTOCOL_TLSv1_2
+    )
+    client.tls_insecure_set(False)
+
 # 사용 예시
 if __name__ == "__main__":
     # MQTT 설정
     MQTT_BROKER = "192.168.86.30"  # 또는 MQTT 서버 IP
-    MQTT_PORT = 1883
+    MQTT_PORT = 8883
 
     # 감시할 디렉토리 설정
     WATCH_DIR = "../src_add"  # 감시할 폴더 경로 변경 필요
