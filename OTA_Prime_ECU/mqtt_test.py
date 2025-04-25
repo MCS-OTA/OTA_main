@@ -4,6 +4,8 @@ import time
 import base64
 import json
 import tarfile
+import ssl
+import hashlib
 import paho.mqtt.client as mqtt
 from utils.OTA_GUI import show_update_gui
 from utils.signature.sub_signature import verify_signature
@@ -11,7 +13,7 @@ from utils.signature.pub_signature import make_payload_with_signature
 from json_manage import JSON_manager
 
 brokerIp = "192.168.86.30"
-port = 1883
+port = 8883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
 topic_to_server = "file/current_json"
@@ -65,6 +67,19 @@ def check_and_build_function(event):
 
 def on_connect(client, userdata, flags, rc):
     print(f"Connected with result code {rc}")
+
+    try:
+        session = client._sock
+        if session:
+            tls_session = session.session
+            session_id = client._sock.session.id  # type: bytes
+            session_hash = hashlib.sha256(session_id).hexdigest()
+
+            print(f"🔐 TLS Session ID: {tls_session.id.hex()}")
+            print(f"🔐 TLS Session ID: {session_id}     ID Hash: {session_hash}")
+    except Exception as e:
+        print(f"⚠️ Failed to retrieve session ID: {e}")
+
     client.subscribe(topic_from_server_notify)
     client.subscribe(topic_from_server_files)
     client.subscribe(topic_permission_client)
@@ -127,7 +142,14 @@ def clear_retained_message(client, topic):
     client.publish(topic, payload="", qos=0, retain=True)
     print(f"Cleared retained message on topic: {topic}")
 
-
+def configure_tls(client):
+    client.tls_set(
+        ca_certs="./utils/certs/ca.crt",
+        certfile="./utils/certs/client.crt",
+        keyfile="./utils/certs/client.key",
+        tls_version=ssl.PROTOCOL_TLSv1_2
+    )
+    client.tls_insecure_set(False)
 
 if __name__ == "__main__":
     # OTA Build Thread
@@ -136,6 +158,7 @@ if __name__ == "__main__":
 
     # MQTT Client
     client = mqtt.Client()
+    configure_tls(client)
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(brokerIp, port, 60)
