@@ -21,6 +21,19 @@ def on_publish(client,userdata,mid):
 def get_current_utc_time():
     return datetime.now(timezone.utc).isoformat()
 
+def make_payload_with_signature(data):
+    data["timestamp"] = get_current_utc_time()
+    message = json.dumps(data, sort_keys=True).encode()
+
+    sk = SigningKey.from_pem(open("./utils/signature/private_master.pem").read())
+    signature = sk.sign(message)
+
+    data["signature"] = base64.b64encode(signature).decode()
+
+    print("Payload:     ", data, "\n\n", "=" * 50)
+
+    return json.dumps(data)
+
 if __name__ == "__main__":
     # MQTT Setting
     client = mqtt.Client(protocol=mqtt.MQTTv5)
@@ -29,35 +42,14 @@ if __name__ == "__main__":
     client.on_disconnect = on_disconnect
     client.on_publish = on_publish
 
-    # Load json file
-    with open("./update.json", "r") as f:
-        data = json.load(f)
-
-    # Add time stamp
-    data["timestamp"] = get_current_utc_time()
-
-    message = json.dumps(data, sort_keys=True).encode()
-    print("Message:    ", message)
-
-    # Make Signature
-    sk = SigningKey.from_pem(open("private.pem").read())
-    signature = sk.sign(message)
-
-    # Add signature to json
-    data["signature"] = base64.b64encode(signature).decode()
-
-    # with open("./signed_update.json", "w") as f:
-    #     json.dump(data, f, indent=4)
-
-    json_message = json.dumps(data)
+    json_message = make_signature_file("./update.json")
 
     # Publish MQTT
     while True:
-        client.connect("192.168.86.39", 1883)
+        client.connect("192.168.86.30", 1883)
         # client.connect("192.168.0.106", 1883)
         client.loop_start()
         try:
-            # pub_message = base64.b64encode(signature + b"/" + message)
             print("Publish:    ", json_message)
             client.publish("OTA", json_message, 2, retain= False)
             print("Success Publish")
