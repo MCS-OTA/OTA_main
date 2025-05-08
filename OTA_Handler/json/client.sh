@@ -1,0 +1,1 @@
+LD_LIBRARY_PATH=./install_folder/lib:$PWD/tcp_client/build COMMONAPI_CONFIG=commonapi4someip.ini VSOMEIP_CONFIGURATION=/home/ota/Documents/json/client.json VSOMEIP_APPLICATION_NAME=ota-client ./tcp_client/build/tcp_client

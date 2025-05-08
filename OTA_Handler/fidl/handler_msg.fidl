@@ -1,0 +1,15 @@
+package commonapi
+
+interface Handler_msg{
+    version { major 0 minor 1}
+    
+    method pushUpdate {
+        in {
+            ByteBuffer firmware
+            ByteBuffer signature
+        }
+        out {
+            Int32 result
+        }
+    }
+}

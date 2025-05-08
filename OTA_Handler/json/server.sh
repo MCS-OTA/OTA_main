@@ -1,0 +1,1 @@
+LD_LIBRARY_PATH=./install_folder/lib:$PWD/tcp_server/build COMMONAPI_CONFIG=commonapi4someip.ini VSOMEIP_CONFIGURATION=/home/ota/Documents/json/server.json VSOMEIP_APPLICATION_NAME=OTA-service-internal ./tcp_server/build/tcp_server
