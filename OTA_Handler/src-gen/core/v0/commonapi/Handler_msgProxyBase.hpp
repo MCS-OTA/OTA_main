@@ -21,6 +21,7 @@
 
 #include <vector>
 
+#include <CommonAPI/Event.hpp>
 #include <CommonAPI/Proxy.hpp>
 #include <functional>
 #include <future>
@@ -36,11 +37,15 @@ namespace commonapi {
 class Handler_msgProxyBase
     : virtual public CommonAPI::Proxy {
 public:
+    typedef CommonAPI::Event<
+        int32_t
+    > HandlerStatusEvent;
 
     typedef std::function<void(const CommonAPI::CallStatus&, const int32_t&)> PushUpdateAsyncCallback;
 
     virtual void pushUpdate(CommonAPI::ByteBuffer _firmware, CommonAPI::ByteBuffer _signature, CommonAPI::CallStatus &_internalCallStatus, int32_t &_result, const CommonAPI::CallInfo *_info = nullptr) = 0;
     virtual std::future<CommonAPI::CallStatus> pushUpdateAsync(const CommonAPI::ByteBuffer &_firmware, const CommonAPI::ByteBuffer &_signature, PushUpdateAsyncCallback _callback = nullptr, const CommonAPI::CallInfo *_info = nullptr) = 0;
+    virtual HandlerStatusEvent& getHandlerStatusEvent() = 0;
 
     virtual std::future<void> getCompletionFuture() = 0;
 };

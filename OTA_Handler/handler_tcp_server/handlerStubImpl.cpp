@@ -42,3 +42,9 @@ void handlerStubImpl::pushUpdate(const std::shared_ptr<CommonAPI::ClientId> _cli
     std::cout << "Complete saving (" << _firmware.size() << " bytes, " << _signature.size() << " bytes)\n";
     _reply(1);
 }
+
+void handlerStubImpl::notifyHandlerStatus(const std::shared_ptr<CommonAPI::ClientId> _client, const int32_t& statusCode) {
+    std::cout << "[Server] Broadcasting status: " << statusCode << std::endl;
+
+    fireHandlerStatusEvent(statusCode);
+}

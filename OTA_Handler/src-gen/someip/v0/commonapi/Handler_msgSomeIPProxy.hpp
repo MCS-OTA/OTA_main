@@ -21,6 +21,7 @@
 #include <CommonAPI/SomeIP/Factory.hpp>
 #include <CommonAPI/SomeIP/Proxy.hpp>
 #include <CommonAPI/SomeIP/Types.hpp>
+#include <CommonAPI/SomeIP/Event.hpp>
 
 #if defined (HAS_DEFINED_COMMONAPI_INTERNAL_COMPILATION_HERE)
 #undef COMMONAPI_INTERNAL_COMPILATION
@@ -54,6 +55,8 @@ public:
 
     virtual ~Handler_msgSomeIPProxy();
 
+    virtual HandlerStatusEvent& getHandlerStatusEvent();
+
     virtual void pushUpdate(CommonAPI::ByteBuffer _firmware, CommonAPI::ByteBuffer _signature, CommonAPI::CallStatus &_internalCallStatus, int32_t &_result, const CommonAPI::CallInfo *_info);
 
     virtual std::future<CommonAPI::CallStatus> pushUpdateAsync(const CommonAPI::ByteBuffer &_firmware, const CommonAPI::ByteBuffer &_signature, PushUpdateAsyncCallback _callback, const CommonAPI::CallInfo *_info);
@@ -63,6 +66,7 @@ public:
     virtual std::future<void> getCompletionFuture();
 
 private:
+    CommonAPI::SomeIP::Event<HandlerStatusEvent, CommonAPI::Deployable< int32_t, CommonAPI::SomeIP::IntegerDeployment<int32_t> >> handlerStatus_;
 
 };
 

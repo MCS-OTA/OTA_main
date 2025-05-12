@@ -4,8 +4,14 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
+#include <condition_variable>
+#include <mutex>
 
 using namespace v0::commonapi;
+
+std::mutex mtx;
+std::condition_variable cv;
+bool exitFlag = false;
 
 int main(){
     CommonAPI::Runtime::setProperty("LogContext", "E01S");
@@ -47,36 +53,44 @@ int main(){
 
 
     std::cout << "Available..." << std::endl;
-    CommonAPI::CallStatus status;
-    int32_t result;
 
-    std::ifstream file("./handler_tcp_client/gui_Test", std::ios::binary);
-    CommonAPI::ByteBuffer firmware((std::istreambuf_iterator<char>(file)), {});
-    CommonAPI::ByteBuffer signature = {0x05, 0x06, 0x07, 0x08};
+    myProxy_inter->getHandlerStatusEvent().subscribe([&](int32_t statusCode) {
+        std::cout << "[Client] Received ServerStatusBroadcast: " << statusCode << std::endl;
 
-    std::cout << "Sending pushUpdate request..." << std::endl;
+        if (statusCode % 10 == 0) {
+            CommonAPI::CallStatus status;
+            int32_t result;
+            std::ifstream file("./handler_tcp_client/gui_Test", std::ios::binary);
+            CommonAPI::ByteBuffer firmware((std::istreambuf_iterator<char>(file)), {});
+            CommonAPI::ByteBuffer signature = {0x05, 0x06, 0x07, 0x08};
 
-    // Firmware & signature 예시 데이터
-    // std::vector<uint8_t> firmware = {0x01, 0x02, 0x03, 0x04};
-    // std::vector<uint8_t> signature = {0x05, 0x06, 0x07, 0x08};
+            std::cout << "Sending pushUpdate request..." << std::endl;
 
-    myProxy_inter->pushUpdateAsync(firmware, signature,
-        [](const CommonAPI::CallStatus& status, const int32_t& result) {
-            if (status == CommonAPI::CallStatus::SUCCESS) {
-                std::cout << "[Async] Success inter pushUpdate, result = " << result << std::endl;
-            } else {
-                std::cout << "[Async] Fail pushUpdate" << std::endl;
-            }
-        });
-    // myProxy_exter->pushUpdate_exterAsync(firmware, signature,
-    //     [](const CommonAPI::CallStatus& status, const int32_t& result) {
-    //         if (status == CommonAPI::CallStatus::SUCCESS) {
-    //             std::cout << "[Async] exter pushUpdate 성공, result = " << result << std::endl;
-    //         } else {
-    //             std::cout << "[Async] pushUpdate 실패!" << std::endl;
-    //         }
-    //     });
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+            // Firmware & signature 예시 데이터
+            // std::vector<uint8_t> firmware = {0x01, 0x02, 0x03, 0x04};
+            // std::vector<uint8_t> signature = {0x05, 0x06, 0x07, 0x08};
+
+            myProxy_inter->pushUpdateAsync(firmware, signature,
+                [](const CommonAPI::CallStatus& status, const int32_t& result) {
+                    if (status == CommonAPI::CallStatus::SUCCESS) {
+                        std::cout << "[Async] Success inter pushUpdate, result = " << result << std::endl;
+                    } else {
+                        std::cout << "[Async] Fail pushUpdate" << std::endl;
+                    }
+                });
+        }
+
+        if (statusCode == 500) {
+            std::unique_lock<std::mutex> lock(mtx);
+            exitFlag = true;
+            cv.notify_one();
+        }
+    });
+
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [&]() { return exitFlag; });
+    }
 
     return 0;
 }

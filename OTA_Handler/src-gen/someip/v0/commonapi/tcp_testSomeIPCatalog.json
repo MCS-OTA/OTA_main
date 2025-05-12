@@ -1,8 +1,0 @@
-{
-    "commonapi.tcp_test" : {
-        "service_id": 4660,
-        "instances" : {
-            "commonapi.tcp_test": 4660
-        }
-    }
-}

@@ -67,6 +67,9 @@ public:
         int32_t result = 0;
         _reply(result);
     }
+    COMMONAPI_EXPORT virtual void fireHandlerStatusEvent(const int32_t &_statusCode) {
+        Handler_msgStub::fireHandlerStatusEvent(_statusCode);
+    }
 
 
 protected:

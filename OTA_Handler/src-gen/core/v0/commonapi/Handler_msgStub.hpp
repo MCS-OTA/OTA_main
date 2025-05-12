@@ -23,6 +23,7 @@
 #define HAS_DEFINED_COMMONAPI_INTERNAL_COMPILATION_HERE
 #endif
 
+#include <unordered_set>
 #include <vector>
 
 
@@ -46,6 +47,11 @@ class Handler_msgStubAdapter
     : public virtual CommonAPI::StubAdapter,
       public virtual Handler_msg {
  public:
+    /**
+    * Sends a broadcast event for handlerStatus. Should not be called directly.
+    * Instead, the "fire<broadcastName>Event" methods of the stub should be used.
+    */
+    virtual void fireHandlerStatusEvent(const int32_t &_statusCode) = 0;
 
 
     virtual void deactivateManagedInstances() = 0;
@@ -93,12 +99,18 @@ public:
     virtual ~Handler_msgStub() {}
     void lockInterfaceVersionAttribute(bool _lockAccess) { static_cast<void>(_lockAccess); }
     bool hasElement(const uint32_t _id) const {
-        return (_id < 1);
+        return (_id < 2);
     }
     virtual const CommonAPI::Version& getInterfaceVersion(std::shared_ptr<CommonAPI::ClientId> _client) = 0;
 
     /// This is the method that will be called on remote calls on the method pushUpdate.
     virtual void pushUpdate(const std::shared_ptr<CommonAPI::ClientId> _client, CommonAPI::ByteBuffer _firmware, CommonAPI::ByteBuffer _signature, pushUpdateReply_t _reply) = 0;
+    /// Sends a broadcast event for handlerStatus.
+    virtual void fireHandlerStatusEvent(const int32_t &_statusCode) {
+        auto stubAdapter = CommonAPI::Stub<Handler_msgStubAdapter, Handler_msgStubRemoteEvent>::stubAdapter_.lock();
+        if (stubAdapter)
+            stubAdapter->fireHandlerStatusEvent(_statusCode);
+    }
 
 
     using CommonAPI::Stub<Handler_msgStubAdapter, Handler_msgStubRemoteEvent>::initStubAdapter;

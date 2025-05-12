@@ -46,7 +46,8 @@ INITIALIZER(registerHandler_msgSomeIPProxy) {
 Handler_msgSomeIPProxy::Handler_msgSomeIPProxy(
     const CommonAPI::SomeIP::Address &_address,
     const std::shared_ptr<CommonAPI::SomeIP::ProxyConnection> &_connection)
-        : CommonAPI::SomeIP::Proxy(_address, _connection)
+        : CommonAPI::SomeIP::Proxy(_address, _connection),
+          handlerStatus_(*this, 0x814c, CommonAPI::SomeIP::event_id_t(0x9ca4), CommonAPI::SomeIP::event_type_e::ET_EVENT , CommonAPI::SomeIP::reliability_type_e::RT_RELIABLE, false, std::make_tuple(static_cast< CommonAPI::SomeIP::IntegerDeployment<int32_t>* >(nullptr)))
 {
 }
 
@@ -54,6 +55,9 @@ Handler_msgSomeIPProxy::~Handler_msgSomeIPProxy() {
 }
 
 
+Handler_msgSomeIPProxy::HandlerStatusEvent& Handler_msgSomeIPProxy::getHandlerStatusEvent() {
+    return handlerStatus_;
+}
 
 void Handler_msgSomeIPProxy::pushUpdate(CommonAPI::ByteBuffer _firmware, CommonAPI::ByteBuffer _signature, CommonAPI::CallStatus &_internalCallStatus, int32_t &_result, const CommonAPI::CallInfo *_info) {
     CommonAPI::Deployable< CommonAPI::ByteBuffer, CommonAPI::SomeIP::ByteBufferDeployment> deploy_firmware(_firmware, static_cast< CommonAPI::SomeIP::ByteBufferDeployment* >(nullptr));

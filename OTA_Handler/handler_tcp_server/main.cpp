@@ -24,8 +24,10 @@ int main(){
     }
 
     std::cout << "Successfully Registered Service!" << std::endl;
-    for(int i = 0; i < 20; i++) {
-        std::cout << "Waiting for calls... (Abort with CTRL+C)" << std::endl;
+
+    int32_t status = 100;
+    while (true) {
+        Service->fireHandlerStatusEvent(status++);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     return 0;

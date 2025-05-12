@@ -47,6 +47,8 @@ public:
         Handler_msgSomeIPStubAdapterHelper::deinit();
     }
 
+    void fireHandlerStatusEvent(const int32_t &_statusCode);
+
     void deactivateManagedInstances() {}
     
     CommonAPI::SomeIP::GetAttributeStubDispatcher<
@@ -82,6 +84,11 @@ public:
     {
         Handler_msgSomeIPStubAdapterHelper::addStubDispatcher( { CommonAPI::SomeIP::method_id_t(0x7530) }, &pushUpdateStubDispatcher );
         // Provided events/fields
+        {
+            std::set<CommonAPI::SomeIP::eventgroup_id_t> itsEventGroups;
+            itsEventGroups.insert(CommonAPI::SomeIP::eventgroup_id_t(0x814c));
+            CommonAPI::SomeIP::StubAdapter::registerEvent(CommonAPI::SomeIP::event_id_t(0x9ca4), itsEventGroups, CommonAPI::SomeIP::event_type_e::ET_EVENT, CommonAPI::SomeIP::reliability_type_e::RT_RELIABLE);
+        }
     }
 
     // Register/Unregister event handlers for selective broadcasts
@@ -89,6 +96,19 @@ public:
     void unregisterSelectiveEventHandlers();
 
 };
+
+template <typename _Stub, typename... _Stubs>
+void Handler_msgSomeIPStubAdapterInternal<_Stub, _Stubs...>::fireHandlerStatusEvent(const int32_t &_statusCode) {
+    CommonAPI::Deployable< int32_t, CommonAPI::SomeIP::IntegerDeployment<int32_t>> deployed_statusCode(_statusCode, static_cast< CommonAPI::SomeIP::IntegerDeployment<int32_t>* >(nullptr));
+    CommonAPI::SomeIP::StubEventHelper<CommonAPI::SomeIP::SerializableArguments<  CommonAPI::Deployable< int32_t, CommonAPI::SomeIP::IntegerDeployment<int32_t> > 
+    >>
+        ::sendEvent(
+            *this,
+            CommonAPI::SomeIP::event_id_t(0x9ca4),
+            false,
+             deployed_statusCode 
+    );
+}
 
 
 template <typename _Stub, typename... _Stubs>

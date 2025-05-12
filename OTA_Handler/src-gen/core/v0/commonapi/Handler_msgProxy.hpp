@@ -89,6 +89,12 @@ public:
      * It will provide the same value for CallStatus as will be handed to the callback.
      */
     virtual std::future<CommonAPI::CallStatus> pushUpdateAsync(const CommonAPI::ByteBuffer &_firmware, const CommonAPI::ByteBuffer &_signature, PushUpdateAsyncCallback _callback = nullptr, const CommonAPI::CallInfo *_info = nullptr);
+    /**
+     * Returns the wrapper class that provides access to the broadcast handlerStatus.
+     */
+    virtual HandlerStatusEvent& getHandlerStatusEvent() {
+        return delegate_->getHandlerStatusEvent();
+    }
 
 
 

@@ -17,4 +17,6 @@ public:
         // int32_t _firmware,
         // int32_t _signature,
         pushUpdateReply_t _reply);
+
+    virtual void notifyHandlerStatus(const std::shared_ptr<CommonAPI::ClientId> _client, const int32_t& statusCode);
 };
