@@ -35,7 +35,7 @@ std::shared_ptr<CommonAPI::SomeIP::StubAdapter> createHandler_msgSomeIPStubAdapt
 void initializeHandler_msgSomeIPStubAdapter() {
     CommonAPI::SomeIP::AddressTranslator::get()->insert(
         "local:commonapi.Handler_msg:v0_1:commonapi.Handler_msg",
-         0x1234, 0x1234, 0, 1);
+         0x1236, 0x567a, 0, 1);
     CommonAPI::SomeIP::Factory::get()->registerStubAdapterCreateMethod(
         "commonapi.Handler_msg:v0_1",
         &createHandler_msgSomeIPStubAdapter);

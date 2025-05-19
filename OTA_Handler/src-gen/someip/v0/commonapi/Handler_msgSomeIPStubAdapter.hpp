@@ -82,7 +82,7 @@ public:
             std::make_tuple(static_cast< CommonAPI::SomeIP::ByteBufferDeployment* >(nullptr)))
         
     {
-        Handler_msgSomeIPStubAdapterHelper::addStubDispatcher( { CommonAPI::SomeIP::method_id_t(0x7530) }, &updateMsgStubDispatcher );
+        Handler_msgSomeIPStubAdapterHelper::addStubDispatcher( { CommonAPI::SomeIP::method_id_t(0x7d00) }, &updateMsgStubDispatcher );
         // Provided events/fields
         {
             std::set<CommonAPI::SomeIP::eventgroup_id_t> itsEventGroups;

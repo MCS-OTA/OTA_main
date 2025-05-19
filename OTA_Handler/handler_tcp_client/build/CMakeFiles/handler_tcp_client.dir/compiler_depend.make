@@ -277,6 +277,9 @@ CMakeFiles/handler_tcp_client.dir/main.cpp.o: /home/ota/Documents/handler_tcp_cl
   /home/ota/Documents/install_folder/include/CommonAPI-3.2/CommonAPI/Proxy.hpp \
   /home/ota/Documents/install_folder/include/CommonAPI-3.2/CommonAPI/Address.hpp \
   /home/ota/Documents/install_folder/include/CommonAPI-3.2/CommonAPI/Attribute.hpp \
+  /home/ota/Documents/src-gen/core/v0/commonapi/Handler_msg_exterProxy.hpp \
+  /home/ota/Documents/src-gen/core/v0/commonapi/Handler_msg_exterProxyBase.hpp \
+  /home/ota/Documents/src-gen/core/v0/commonapi/Handler_msg_exter.hpp \
   /usr/include/c++/12/thread \
   /usr/include/c++/12/bits/this_thread_sleep.h \
   /usr/include/c++/12/fstream \
@@ -326,6 +329,10 @@ CMakeFiles/handler_tcp_client.dir/main.cpp.o: /home/ota/Documents/handler_tcp_cl
 /usr/include/c++/12/fstream:
 
 /usr/include/c++/12/bits/this_thread_sleep.h:
+
+/home/ota/Documents/src-gen/core/v0/commonapi/Handler_msg_exterProxyBase.hpp:
+
+/home/ota/Documents/src-gen/core/v0/commonapi/Handler_msg_exterProxy.hpp:
 
 /usr/include/aarch64-linux-gnu/c++/12/bits/basic_file.h:
 
@@ -706,6 +713,8 @@ CMakeFiles/handler_tcp_client.dir/main.cpp.o: /home/ota/Documents/handler_tcp_cl
 /usr/include/aarch64-linux-gnu/sys/types.h:
 
 /usr/include/aarch64-linux-gnu/bits/waitflags.h:
+
+/home/ota/Documents/src-gen/core/v0/commonapi/Handler_msg_exter.hpp:
 
 /usr/include/c++/12/bits/predefined_ops.h:
 

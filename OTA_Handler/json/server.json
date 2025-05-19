@@ -11,15 +11,15 @@
     "applications" : 
     [
         {
-            "name": "event_server", 
+            "name": "ota_server", 
             "id": "0x1818"
         }
     ],
     "services" : 
     [
         {
-            "service": "0x1234",
-            "instance": "0x1234",
+            "service": "0x1236",
+            "instance": "0x567a",
             "reliable": "30549"
         }
     ],

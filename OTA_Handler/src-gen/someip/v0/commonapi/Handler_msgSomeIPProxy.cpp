@@ -33,7 +33,7 @@ std::shared_ptr<CommonAPI::SomeIP::Proxy> createHandler_msgSomeIPProxy(
 void initializeHandler_msgSomeIPProxy() {
     CommonAPI::SomeIP::AddressTranslator::get()->insert(
         "local:commonapi.Handler_msg:v0_1:commonapi.Handler_msg",
-        0x1234, 0x1234, 0, 1);
+        0x1236, 0x567a, 0, 1);
     CommonAPI::SomeIP::Factory::get()->registerProxyCreateMethod(
         "commonapi.Handler_msg:v0_1",
         &createHandler_msgSomeIPProxy);
@@ -77,7 +77,7 @@ void Handler_msgSomeIPProxy::updateMsg(CommonAPI::ByteBuffer _udsRequest, Common
         >
     >::callMethodWithReply(
         *this,
-        CommonAPI::SomeIP::method_id_t(0x7530),
+        CommonAPI::SomeIP::method_id_t(0x7d00),
         true,
         false,
         (_info ? _info : &CommonAPI::SomeIP::defaultCallInfo),
@@ -105,7 +105,7 @@ std::future<CommonAPI::CallStatus> Handler_msgSomeIPProxy::updateMsgAsync(const 
         >
     >::callMethodAsync(
         *this,
-        CommonAPI::SomeIP::method_id_t(0x7530),
+        CommonAPI::SomeIP::method_id_t(0x7d00),
         true,
         false,
         (_info ? _info : &CommonAPI::SomeIP::defaultCallInfo),

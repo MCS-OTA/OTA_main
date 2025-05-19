@@ -1,1 +1,0 @@
-LD_LIBRARY_PATH=./install_folder/lib:$PWD/test_client/build COMMONAPI_CONFIG=commonapi4someip.ini VSOMEIP_CONFIGURATION=/home/ota/Documents/json/client.json VSOMEIP_APPLICATION_NAME=event_client ./test_client/build/event_client

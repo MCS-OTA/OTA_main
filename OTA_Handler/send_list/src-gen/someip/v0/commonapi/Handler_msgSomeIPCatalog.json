@@ -1,8 +1,0 @@
-{
-    "commonapi.Handler_msg" : {
-        "service_id": 4660,
-        "instances" : {
-            "commonapi.Handler_msg": 4660
-        }
-    }
-}

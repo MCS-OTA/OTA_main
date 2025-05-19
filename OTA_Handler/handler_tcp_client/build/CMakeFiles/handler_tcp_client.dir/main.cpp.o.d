@@ -227,6 +227,9 @@ CMakeFiles/handler_tcp_client.dir/main.cpp.o: \
  /home/ota/Documents/handler_tcp_client/../install_folder/include/CommonAPI-3.2/CommonAPI/Proxy.hpp \
  /home/ota/Documents/handler_tcp_client/../install_folder/include/CommonAPI-3.2/CommonAPI/Address.hpp \
  /home/ota/Documents/handler_tcp_client/../install_folder/include/CommonAPI-3.2/CommonAPI/Attribute.hpp \
+ /home/ota/Documents/handler_tcp_client/../src-gen/core/v0/commonapi/Handler_msg_exterProxy.hpp \
+ /home/ota/Documents/handler_tcp_client/../src-gen/core/v0/commonapi/Handler_msg_exterProxyBase.hpp \
+ /home/ota/Documents/handler_tcp_client/../src-gen/core/v0/commonapi/Handler_msg_exter.hpp \
  /usr/include/c++/12/thread /usr/include/c++/12/bits/this_thread_sleep.h \
  /usr/include/c++/12/fstream /usr/include/c++/12/bits/codecvt.h \
  /usr/include/aarch64-linux-gnu/c++/12/bits/basic_file.h \

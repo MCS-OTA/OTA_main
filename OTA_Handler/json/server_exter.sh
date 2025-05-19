@@ -1,0 +1,1 @@
+LD_LIBRARY_PATH=./install_folder/lib:$PWD/handler_tcp_server_exter/build COMMONAPI_CONFIG=commonapi4someip.ini VSOMEIP_CONFIGURATION=/home/pi/Documents/json/server_exter.json VSOMEIP_APPLICATION_NAME=ota_server_exter ./handler_tcp_server_exter/build/handler_tcp_server_exter

@@ -1,4 +1,0 @@
-/home/ota/Documents/handler_tcp_client/build/CMakeFiles/handler_tcp_client.dir
-/home/ota/Documents/handler_tcp_client/build/CMakeFiles/handler_tcp_client-someip.dir
-/home/ota/Documents/handler_tcp_client/build/CMakeFiles/edit_cache.dir
-/home/ota/Documents/handler_tcp_client/build/CMakeFiles/rebuild_cache.dir
