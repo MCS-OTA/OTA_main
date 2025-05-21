@@ -476,3 +476,21 @@ int main(void)
 }
 
 
+Performing C++ SOURCE FILE Test HAS_STDCXXFS succeeded with the following output:
+Change Dir: /home/ota/Documents/handler_tcp_server/build/CMakeFiles/CMakeScratch/TryCompile-rdoZuA
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1d48e/fast && gmake[1]: Entering directory '/home/ota/Documents/handler_tcp_server/build/CMakeFiles/CMakeScratch/TryCompile-rdoZuA'
+/usr/bin/gmake  -f CMakeFiles/cmTC_1d48e.dir/build.make CMakeFiles/cmTC_1d48e.dir/build
+gmake[2]: Entering directory '/home/ota/Documents/handler_tcp_server/build/CMakeFiles/CMakeScratch/TryCompile-rdoZuA'
+Building CXX object CMakeFiles/cmTC_1d48e.dir/src.cxx.o
+/usr/bin/c++ -DHAS_STDCXXFS  -lstdc++fs -o CMakeFiles/cmTC_1d48e.dir/src.cxx.o -c /home/ota/Documents/handler_tcp_server/build/CMakeFiles/CMakeScratch/TryCompile-rdoZuA/src.cxx
+Linking CXX executable cmTC_1d48e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1d48e.dir/link.txt --verbose=1
+/usr/bin/c++ CMakeFiles/cmTC_1d48e.dir/src.cxx.o -o cmTC_1d48e 
+gmake[2]: Leaving directory '/home/ota/Documents/handler_tcp_server/build/CMakeFiles/CMakeScratch/TryCompile-rdoZuA'
+gmake[1]: Leaving directory '/home/ota/Documents/handler_tcp_server/build/CMakeFiles/CMakeScratch/TryCompile-rdoZuA'
+
+
+Source file was:
+int main() { return 0; }
+

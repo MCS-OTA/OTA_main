@@ -4,12 +4,33 @@ using namespace v0::commonapi;
 
 handlerStubImpl::handlerStubImpl() : downloadStarted_(false){
     std::cout << "[Server] HandlerStubImpl called.\n";
-
+    //read undone stauts file
+    if (!std::filesystem::exists(statusFilePath_)){
+        std::ofstream create_file(statusFilePath_);
+        create_file << "status=0"<<std::endl;
+        create_file.close();
+    }else{
+        std::ifstream file(statusFilePath_);
+        std::string line;
+        while(std::getline(file, line)){
+            if(line.rfind("status=",0)==0){
+                status_ = std::stoi(line.substr(7));
+                break;
+            }
+        }
+        file.close();
+    }
 }
 
 handlerStubImpl::~handlerStubImpl(){
     
 }
+void handlerStubImpl::saveStatus(){
+    std::ofstream file(statusFilePath_);
+    file<<"status="<<status_<<std::endl;
+    file.close();
+}
+
 
 void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _client, const CommonAPI::ByteBuffer udsMsg, updateMsgReply_t _reply) {
     if (udsMsg.empty()) {
@@ -40,22 +61,31 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
             //     response = {0x7F, serviceID, 0x11};
             //     break;
             // }
-            updateFile_.open("./handler_tcp_server/received_update", std::ios::binary | std::ios::out);
+            updateFile_.open("./handler_tcp_server/received_update", std::ios::binary | std::ios::app);
             if (!updateFile_) {
                 std::cerr << "Fail to create new file" << std::endl;
                 response = {0x7F, serviceID, 0x11};
             }
 
+            if (updateFile_.is_open()) {
+                updateFile_.close();
+            }
+
             downloadStarted_ = true;
             setStatus(static_cast<int32_t>(HandlerStatus::WAIT));
+            //change
             response = {0x74};
             break;
         }
 
         case 0x36: {
             setStatus(static_cast<int32_t>(HandlerStatus::PROCESSING));
-            CommonAPI::ByteBuffer file(udsMsg.begin() + 1, udsMsg.end());
+            int32_t n = udsMsg[2];
+            std::cout<<"# of chunks: "<<n<<std::endl;
+            CommonAPI::ByteBuffer file(udsMsg.begin() + 3, udsMsg.end());
             
+            updateFile_.open("./handler_tcp_server/received_update", std::ios::binary | std::ios::app);
+
             try {
                 if (updateFile_.is_open()) {
                     updateFile_.write(reinterpret_cast<const char*>(file.data()), file.size());
@@ -71,7 +101,12 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
                 response = {0x7F, serviceID, 0x11};
                 break;
             }
-
+            if (updateFile_.is_open()) {
+                updateFile_.close();
+                std::cout<<"chunk # "<<n<<"is closed"<<std::endl;
+            }else{
+                std::cout<<"nothing to close"<<std::endl;
+            }
             // if (!downloadStarted_ || !firmwareFile_.is_open()) {
             //     std::cerr << "TransferData called before RequestDownload.\n";
             //     response = {0x7F, serviceID, 0x11};
@@ -79,8 +114,9 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
             // }
 
             //firmwareFile_.write(reinterpret_cast<const char*>(&udsRequest[1]), udsRequest.size() - 1);
-            setStatus(static_cast<int32_t>(HandlerStatus::WAIT));
-            response = {0x76};
+            //setStatus(static_cast<int32_t>(HandlerStatus::WAIT));
+            response = {0x76, static_cast<uint8_t>(n+1)}; //0x76, iter
+            // save undone status file
             break;
         }
 
@@ -89,16 +125,21 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
             // if (firmwareFile_.is_open()) {
             //     firmwareFile_.close();
             // }
+            // del undone undone status file
 
-            if (updateFile_.is_open()) {
-                updateFile_.close();
-            }
+            // if (updateFile_.is_open()) {
+            //     updateFile_.close();
+            // }
 
             downloadStarted_ = false;
             setStatus(static_cast<int32_t>(HandlerStatus::VERIFY));
             
             // Process the verification
 
+            // move file
+            std::string targetDir = extractDirFromJson("/home/ota/boot_manager/status.json", 4);
+            targetDir = "/home/ota/boot_manager/" + targetDir + "/received_update";
+            moveFile("./handler_tcp_server/received_update", targetDir); 
             setStatus(static_cast<int32_t>(HandlerStatus::READY));
             response = {0x77};
             break;
@@ -111,6 +152,7 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
     }
 
     _reply(response);
+    if (getStatus() == static_cast<int32_t>(HandlerStatus::PROCESSING)) setStatus(static_cast<int32_t>(HandlerStatus::WAIT));
 }
 
 // void handlerStubImpl::pushUpdate(const std::shared_ptr<CommonAPI::ClientId> _client, 

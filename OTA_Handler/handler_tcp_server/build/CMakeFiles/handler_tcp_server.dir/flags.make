@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/ota/Documents/handler_tcp_server/build -I/home/ota/Documents/handler_tcp_server -I/home/ota/Documents/handler_tcp_server/../src-gen -I/home/ota/Documents/handler_tcp_server/../install_folder/include/CommonAPI-3.2 -I/home/ota/Documents/handler_tcp_server/../install_folder/include -I/home/ota/Documents/handler_tcp_server/../install_folder/lib -I/home/ota/Documents/handler_tcp_server/../src-gen/core -I/home/ota/Documents/handler_tcp_server/../src-gen/someip
 
-CXX_FLAGS = -std=gnu++11
+CXX_FLAGS = -std=gnu++17
 

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -62,6 +62,17 @@ find_library(VSOMEIP_LIB vsomeip3 PATHS ../install_folder/lib)
 message("COMMONAPI_LIB: ${COMMONAPI_LIB}")
 message("COMMONAPI_SOMEIP_LIB: ${COMMONAPI_SOMEIP_LIB}")
 message("VSOMEIP_LIB: ${VSOMEIP_LIB}")
+
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-lstdc++fs" HAS_STDCXXFS)
+if (HAS_STDCXXFS)
+    set(FILESYSTEM_LIB stdc++fs)
+else()
+    set(FILESYSTEM_LIB stdc++fs)
+endif()
+
+
 # 라이브러리 연결
 target_link_libraries(handler_tcp_server
     PRIVATE
@@ -69,7 +80,7 @@ target_link_libraries(handler_tcp_server
     ${COMMONAPI_SOMEIP_LIB}
     ${VSOMEIP_LIB}
     Threads::Threads
-
+    ${FILESYSTEM_LIB}
 )
 
 add_library(${PRJ_NAME}-someip SHARED ${PRJ_SOMEIP_LIB_SRCS})

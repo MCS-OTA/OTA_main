@@ -111,11 +111,56 @@ CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/co
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPStubAdapter.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPStubAdapter.cpp -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPStubAdapter.cpp.s
 
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o: CMakeFiles/handler_tcp_server-someip.dir/flags.make
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o: /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o: CMakeFiles/handler_tcp_server-someip.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o -MF CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o.d -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o -c /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp > CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.i
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.s
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o: CMakeFiles/handler_tcp_server-someip.dir/flags.make
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o: /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o: CMakeFiles/handler_tcp_server-someip.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o -MF CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o.d -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o -c /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp > CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.i
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.s
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o: CMakeFiles/handler_tcp_server-someip.dir/flags.make
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o: /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o: CMakeFiles/handler_tcp_server-someip.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o -MF CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o.d -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o -c /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp > CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.i
+
+CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp -o CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.s
+
 # Object files for target handler_tcp_server-someip
 handler_tcp_server__someip_OBJECTS = \
 "CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPDeployment.cpp.o" \
 "CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPProxy.cpp.o" \
-"CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPStubAdapter.cpp.o"
+"CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPStubAdapter.cpp.o" \
+"CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o" \
+"CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o" \
+"CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o"
 
 # External object files for target handler_tcp_server-someip
 handler_tcp_server__someip_EXTERNAL_OBJECTS =
@@ -123,12 +168,15 @@ handler_tcp_server__someip_EXTERNAL_OBJECTS =
 libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPDeployment.cpp.o
 libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPProxy.cpp.o
 libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msgSomeIPStubAdapter.cpp.o
+libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPDeployment.cpp.o
+libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPProxy.cpp.o
+libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/home/ota/Documents/src-gen/someip/v0/commonapi/Handler_msg_exterSomeIPStubAdapter.cpp.o
 libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/build.make
 libhandler_tcp_server-someip.so: /home/ota/Documents/install_folder/lib/libCommonAPI-SomeIP.so.3.2.4
 libhandler_tcp_server-someip.so: /home/ota/Documents/install_folder/lib/libCommonAPI.so.3.2.4
 libhandler_tcp_server-someip.so: /home/ota/Documents/install_folder/lib/libvsomeip3.so.3.5.5
 libhandler_tcp_server-someip.so: CMakeFiles/handler_tcp_server-someip.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared library libhandler_tcp_server-someip.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX shared library libhandler_tcp_server-someip.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/handler_tcp_server-someip.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

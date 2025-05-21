@@ -24,10 +24,30 @@ int main(){
         successfullyRegistered = runtime->registerService(domain, instance, Service);
     }
 
-    Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
+    //Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
+    int status = Service->getStatus();
+    //if service->status_ == 5; service->ststus_ ++;
 
     std::cout << "Successfully Registered Service!" << std::endl;
     //Service->setStatus(static_cast<int32_t>(HandlerStatus::INIT));
+
+    // start shell
+    if (status == 5){
+        status = 6;
+        Service->setStatus(static_cast<int32_t>(HandlerStatus::ACTIVATE));
+        int ret = system("sh /home/ota/boot_manager/boot_manager.sh")
+        int exitCode = WEXITSTATUS(ret);
+        if(exitCode == 0){
+            std::cout<<"##### New File Activate Success #####" << std::endl;
+            Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
+        }else{
+            std::cout <<"%%%%% New File Activate Error %%%%%" << std::endl;
+            Service->setStatus(static_cast<int32_t>(HandlerStatus::ERROR));
+        }
+    }else{
+        int ret = system("sh /home/ota/boot_manager/simpleStart.sh")
+    }
+
 
     std::thread statusThread([&Service]() {
         while (true) {

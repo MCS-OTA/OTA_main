@@ -109,12 +109,12 @@ CMakeFiles/handler_tcp_server.dir/clean:
 CMakeFiles/handler_tcp_server-someip.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/handler_tcp_server-someip.dir/build.make CMakeFiles/handler_tcp_server-someip.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/handler_tcp_server-someip.dir/build.make CMakeFiles/handler_tcp_server-someip.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=4,5,6,7 "Built target handler_tcp_server-someip"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ota/Documents/handler_tcp_server/build/CMakeFiles --progress-num=4,5,6,7,8,9,10 "Built target handler_tcp_server-someip"
 .PHONY : CMakeFiles/handler_tcp_server-someip.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/handler_tcp_server-someip.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ota/Documents/handler_tcp_server/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ota/Documents/handler_tcp_server/build/CMakeFiles 7
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/handler_tcp_server-someip.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/ota/Documents/handler_tcp_server/build/CMakeFiles 0
 .PHONY : CMakeFiles/handler_tcp_server-someip.dir/rule
