@@ -61,15 +61,17 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
             //     response = {0x7F, serviceID, 0x11};
             //     break;
             // }
-            updateFile_.open("./handler_tcp_server/received_update", std::ios::binary | std::ios::app);
-            if (!updateFile_) {
-                std::cerr << "Fail to create new file" << std::endl;
-                response = {0x7F, serviceID, 0x11};
-            }
 
-            if (updateFile_.is_open()) {
-                updateFile_.close();
-            }
+
+            // updateFile_.open("./handler_tcp_server/received_update", std::ios::binary | std::ios::app);
+            // if (!updateFile_) {
+            //     std::cerr << "Fail to create new file" << std::endl;
+            //     response = {0x7F, serviceID, 0x11};
+            // }
+
+            // if (updateFile_.is_open()) {
+            //     updateFile_.close();
+            // }
 
             downloadStarted_ = true;
             setStatus(static_cast<int32_t>(HandlerStatus::WAIT));
@@ -79,13 +81,21 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
         }
 
         case 0x36: {
+            // Start Installation
             setStatus(static_cast<int32_t>(HandlerStatus::PROCESSING));
-            int32_t n = udsMsg[2];
-            std::cout<<"# of chunks: "<<n<<std::endl;
-            CommonAPI::ByteBuffer file(udsMsg.begin() + 3, udsMsg.end());
             
-            updateFile_.open("./handler_tcp_server/received_update", std::ios::binary | std::ios::app);
+            // Read udsRequest message
+            int32_t n = udsMsg[2];
+            int8_t fileNameLength = static_cast<int8_t>(udsMsg[3]);
+            std::cout << "current file length:" << fileNameLength<< std::endl;
+            std::string fileName = std::string(udsMsg.begin() + 4,udsMsg.begin() + fileNameLength + 4);
+            std::cout << "current file name:" << fileName << std::endl;
+            std::cout<<"# of chunks: "<<n<<std::endl;
+            CommonAPI::ByteBuffer file(udsMsg.begin() + 4 + fileNameLength, udsMsg.end());
+            fileName = "./handler_tcp_server/" + fileName;
+            updateFile_.open(fileName, std::ios::binary | std::ios::app);
 
+            // Write file
             try {
                 if (updateFile_.is_open()) {
                     updateFile_.write(reinterpret_cast<const char*>(file.data()), file.size());
@@ -103,7 +113,7 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
             }
             if (updateFile_.is_open()) {
                 updateFile_.close();
-                std::cout<<"chunk # "<<n<<"is closed"<<std::endl;
+                std::cout<<"file:"<<fileName<<" chunk # "<<n<<"is closed"<<std::endl;
             }else{
                 std::cout<<"nothing to close"<<std::endl;
             }
@@ -115,6 +125,8 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
 
             //firmwareFile_.write(reinterpret_cast<const char*>(&udsRequest[1]), udsRequest.size() - 1);
             //setStatus(static_cast<int32_t>(HandlerStatus::WAIT));
+
+            // Set udsResponse message
             response = {0x76, static_cast<uint8_t>(n+1)}; //0x76, iter
             // save undone status file
             break;
@@ -138,7 +150,7 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
 
             // move file
             std::string targetDir = extractDirFromJson("/home/ota/boot_manager/status.json", 4);
-            targetDir = "/home/ota/boot_manager/" + targetDir + "/received_update";
+            targetDir = "/home/ota/boot_manager/" + targetDir + "/my_app";
             moveFile("./handler_tcp_server/received_update", targetDir); 
             setStatus(static_cast<int32_t>(HandlerStatus::READY));
             response = {0x77};

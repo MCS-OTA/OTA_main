@@ -1,6 +1,8 @@
 #include <CommonAPI/CommonAPI.hpp>
 #include <v0/commonapi/Handler_msgProxy.hpp>
 #include <v0/commonapi/Handler_msg_exterProxy.hpp>
+#include <openssl/cmac.h>
+#include <openssl/evp.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -10,8 +12,10 @@
 #include <mutex>
 #include <filesystem>
 #include <vector>
+#include <json.hpp>
 
 using namespace v0::commonapi;
+using json = nlohmann::json;
 
 std::mutex mtx;
 std::condition_variable cv;
@@ -25,9 +29,10 @@ int main(){
     CommonAPI::Runtime::setProperty("LibraryBase", "handler_tcp_client");
     std::shared_ptr < CommonAPI::Runtime > runtime = CommonAPI::Runtime::get();
     int counter = 0;
+    int file_N = 0;
+    int file_Total = 0;
     int chunkN = 0;
     int chunkTotal = 0;
-
     std::string domain = "local";
     std::string instance = "commonapi.Handler_msg";
     std::string instance_exter = "commonapi.Handler_msg_exter";
@@ -55,9 +60,12 @@ int main(){
         if(std::getline(file, line)){
             size_t slash = line.find('/');
             if (slash != std::string::npos){
-                chunkN = std::stoi(line.substr(0,slash));
-                chunkTotal = std::stoi(line.substr(slash + 1));
+                file_N = std::stoi(line.substr(0,slash));
+                file_Total = std::stoi(line.substr(slash + 1));
             }
+        }
+        if(file_N != file_Total){
+
         }
         file.close();
     }
@@ -190,8 +198,8 @@ int main(){
         CommonAPI::ByteBuffer udsRequest;
         switch (statusCode) {
             case 0: //IDLE
-                // If the Master ECU downloads the update file     
-                if (!std::filesystem::is_empty(updatePath)){
+                // If the Master ECU downloads the update file
+                if (std::filesystem::exists("./handler_tcp_client/update/list.json")){
                     udsRequest = {0x33};
                     std::cout << "Status: 0\n\n" << std::endl;
 
@@ -211,85 +219,207 @@ int main(){
                     std::cout << "\nNO UPDATE\n" << std:: endl;
                     break;
                 }
-            case 1: // INIT
+            case 1: {// INIT
                 // RequestDownload(0x34)
                 //udsRequest.push_back(0x34);
                 udsRequest = {0x34};
                 std::cout << "Status: 1\n\n" << std::endl;
 
-                myProxy_inter->updateMsgAsync(udsRequest, 
-                    [](const CommonAPI::CallStatus& status, CommonAPI::ByteBuffer result) {
-                    std::cout << "Send Request1\n\n" << std::endl;
-                    if (result[0] == 0x7F) {
-                        std::cout << "Negative Response1\n" << std::endl;
-                    }
-                    else {
-                        std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
-                    }
-                });
-                break;
-            case 2: {// WAIT
-                // TransferData(0x36)
-                int32_t chunkSize = 100;
-                //int32_t n = 0; //read
-                udsRequest = {0x36};
-                std::ifstream file("./handler_tcp_client/update/gui_Test", std::ios::binary);
-                CommonAPI::ByteBuffer chunk((std::istreambuf_iterator<char>(file)), {});
+                std::ifstream file("./handler_tcp_client/update/list.json", std::ios::binary);
+                json j;
 
-                std::vector<CommonAPI::ByteBuffer> chunks = splitIntoChunk(chunk, chunkSize);
-                int32_t total_n = chunks.size();
-                if(chunkN < total_n) {
-                    udsRequest.push_back(total_n);
-                    udsRequest.push_back(chunkN);
-                    udsRequest.insert(udsRequest.end(), chunks[chunkN].begin(),chunks[chunkN].end());
-                    udsRequest.insert(udsRequest.end(), chunks[chunkN].begin(),chunks[chunkN].end());
-
-
-                    // while (file.read(reinterpret_cast<char*>(block.data()), block.size()) || file.gcount()) {
-                    //     size_t size = file.gcount();
-                    //     block.resize(size);
-                    // }
-
-
-
-                    myProxy_inter->updateMsgAsync(udsRequest,
-                        [&](const CommonAPI::CallStatus& status, CommonAPI::ByteBuffer result){
-                        std::cout << "Send Request2 ## chunks number "<<chunkN<<"out of "<<total_n << std::endl;
-                        if (result[0] == 0x7F) {
-                            std::cout << "Negative Response\n" << std::endl;
-                        }
-                        else {
-                            std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
-                            chunkN = static_cast<int>(result[1]);
-                            std::cout << "chunkN is " <<chunkN<<std::endl;
-                        }
-                    });
-
-                    std::ofstream file(chunkStatusFilePath_);
-                    file << std::to_string(chunkN+1) << "/" << std::to_string(total_n)<<std::endl;
-                    file.close();
-
-                
-                }
-                else {
-                    // If transferring process end, TransferExit(0x37)
-                    udsRequest = {0x37};
-                    myProxy_inter->updateMsgAsync(udsRequest, 
-                        [](const CommonAPI::CallStatus& status, CommonAPI::ByteBuffer result){
-                        std::cout << "Send Request3\n\n" << std::endl;
-                        if (result[0] == 0x7F) {
-                            std::cout << "Negative Response\n" << std::endl;
-                        }
-                        else {
-                            std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
-                        }
-                    });
-                    std::ofstream file(chunkStatusFilePath_);
-                    file << "0/0" <<std::endl;
-                    file.close();
+                if(!file.is_open()){
+                    std::cerr << "cannot open list.json" <<std::endl;
                     break;
-                    // verify and change chunkN to 0/0
                 }
+                try{
+                    file >> j;
+                    file.close();
+                }catch(json::parse_error& e){
+                    std::cerr << "json parsing error: " <<e.what() << std::endl;
+                    break;
+                }
+
+                // Check the new file on update directory
+                std::filesystem::path baseDir = std::filesystem::current_path();
+                std::filesystem::path interDir = "handler_tcp_client/update";
+                baseDir = baseDir / interDir;
+                std::cout << "current_dir: " << baseDir <<std::endl;
+                size_t numInDir = 0;
+                if(j.contains("files")&&j["files"].is_array()){
+                    for(auto& file : j["files"]){
+                        std::string filename = file.value("name", "");
+                        if (filename.empty()){
+                            std::cerr << "%%%%% Empty File Name %%%%%" <<std::endl;
+                            continue;
+                        }
+                        std::filesystem::path filePath = baseDir / filename;
+                        if(std::filesystem::exists(filePath)){
+                            std::cout<<"Exist: "<<filePath<<std::endl;
+                            file["status"] = "0/0";
+                            numInDir ++;
+                        }else{
+                            std::cerr<<"Not Exitst: "<<filePath<<std::endl;
+                        }
+                        std::ofstream output("./handler_tcp_client/update/list.json");
+                        if(!output.is_open()){
+                            std::cerr << "cannot open list.json" <<std::endl;
+                            break;
+                        }
+                        output<<j.dump(4);
+                        output.close();
+                    }
+
+                    // After check all new files, transfer messsage(0x34)
+                    if(j["files"].size() == numInDir){
+                        std::cout<<numInDir<<"/"<<j["files"].size()<<std::endl;
+                        myProxy_inter->updateMsgAsync(udsRequest, 
+                            [](const CommonAPI::CallStatus& status, CommonAPI::ByteBuffer result) {
+                            std::cout << "Send Request1\n\n" << std::endl;
+                            if (result[0] == 0x7F) {
+                                std::cout << "Negative Response1\n" << std::endl;
+                            }
+                            else {
+                                std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
+                            }
+                        });
+                        std::ofstream file(chunkStatusFilePath_);
+                        file << "0/" << std::to_string(numInDir)<<std::endl;
+                        file.close();
+                    }
+
+                }else{
+                    std::cerr<<"Empty Array: "<< std::endl;
+                }
+
+                break;
+            }
+            case 2: {// WAIT
+                int32_t chunkSize = 8000;
+
+                // Read update list json file
+                std::ifstream file("./handler_tcp_client/update/list.json", std::ios::binary);
+                json j;
+
+                if(!file.is_open()){
+                    std::cerr << "cannot open list.json" <<std::endl;
+                    break;
+                }
+                try{
+                    file >> j;
+                    file.close();
+                }catch(json::parse_error& e){
+                    std::cerr << "json parsing error: " <<e.what() << std::endl;
+                    break;
+                }
+
+                std::filesystem::path baseDir = std::filesystem::current_path();
+                std::filesystem::path interDir = "handler_tcp_client/update";
+                baseDir = baseDir / interDir;
+                if(j.contains("files")&&j["files"].is_array()){
+                    int8_t completeFile = 0;
+                    // Transfer all update file to the target ECU
+                    for(auto& file : j["files"]){
+                        udsRequest = {0x36};
+                        std::string sta = file.value("status","");
+                        size_t slash = sta.find('/');
+                        if (slash != std::string::npos){
+                            chunkN = std::stoi(sta.substr(0,slash));
+                            chunkTotal = std::stoi(sta.substr(slash + 1));
+                            std::cout << "chunkN : "<<chunkN << " chunkTotal:" <<chunkTotal<<std::endl;
+                        }
+
+                        // When the transferring of one file end,
+                        if(chunkN != 0 && chunkTotal !=0 &&chunkN == chunkTotal){
+                            completeFile++;
+                            if (completeFile == j["files"].size()) {
+                                std::cout << "\n\t\t\tInstallation Finished\n" << std::endl;
+
+                                // If transferring process end, TransferExit(0x37)
+                                udsRequest = {0x37};
+                                myProxy_inter->updateMsgAsync(udsRequest, 
+                                    [](const CommonAPI::CallStatus& status, CommonAPI::ByteBuffer result){
+                                    std::cout << "Send Request3\n\n" << std::endl;
+                                    if (result[0] == 0x7F) {
+                                        std::cout << "Negative Response\n" << std::endl;
+                                    }
+                                    else {
+                                        std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
+                                    }
+                                });
+                                break;
+                            }
+                            else continue;
+                        }
+
+                        std::string filename = file.value("name", "");
+                        uint8_t name_length = static_cast<uint8_t>(filename.length());
+                        if (filename.empty()){
+                            std::cerr << "%%%%% Empty File Name %%%%%" <<std::endl;
+                            continue;
+                        }
+                        std::filesystem::path filePath = baseDir / filename;
+                        if(std::filesystem::exists(filePath)){
+                            std::cout<<"Exist: "<<filePath<<std::endl;
+                        }else{
+                            std::cerr<<"Not Exitst: "<<filePath<<std::endl;
+                        }
+
+                        std::ifstream file_(filePath, std::ios::binary);
+                        CommonAPI::ByteBuffer chunk((std::istreambuf_iterator<char>(file_)), {});
+        
+                        std::vector<CommonAPI::ByteBuffer> chunks = splitIntoChunk(chunk, chunkSize);
+                        int32_t total_n = chunks.size();
+                        std::cout << total_n <<std::endl;
+                        if(chunkN < total_n) {
+                            udsRequest.push_back(total_n);
+                            udsRequest.push_back(chunkN);
+                            udsRequest.push_back(name_length);
+                            std::cout << "file name length: " <<name_length <<std::endl;
+                            udsRequest.insert(udsRequest.end(), filename.begin(), filename.end());
+                            std::cout << "filename: " <<filename<<std::endl;
+                            udsRequest.insert(udsRequest.end(), chunks[chunkN].begin(),chunks[chunkN].end());
+        
+                            CommonAPI::CallStatus callStatus;
+                            CommonAPI::ByteBuffer result;
+                            myProxy_inter->updateMsg(udsRequest, callStatus, result);
+                            std::cout << "Send Request2 ## chunks number "<<chunkN<<"out of "<<total_n << std::endl;
+                            if (callStatus == CommonAPI::CallStatus::SUCCESS){
+                                if (result[0] == 0x7F) {
+                                    std::cout << "Negative Response\n" << std::endl;
+                                }
+                                else {
+                                    std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
+                                    chunkN = static_cast<int>(result[1]);
+                                    std::cout << "chunkN is " <<chunkN<<std::endl;
+                                    file["status"] = std::to_string(chunkN) + "/" + std::to_string(total_n);
+                                    std::ofstream output("./handler_tcp_client/update/list.json");
+                                    if(!output.is_open()){
+                                        std::cerr << "cannot open list.json" <<std::endl;
+                                        break;
+                                    }
+                                    output<<j.dump(4);
+                                    output.close();
+                                }
+                            }else{
+                                std::cerr << "CallStatus Failed"<<std::endl;
+                            }
+                            std::string stat = std::to_string(chunkN) + "/" + std::to_string(total_n);
+                            file["status"] = stat;
+                        }
+                        
+                        break;
+
+                        // verify and change chunkN to 0/0
+                        
+                    }
+
+                }else{
+                    std::cerr<<"Empty Array: "<< std::endl;
+                }
+
+                // }
+
             }
             case 3: // PROCESSING
                 break;
@@ -329,3 +459,4 @@ std::vector<CommonAPI::ByteBuffer> splitIntoChunk(const CommonAPI::ByteBuffer& d
     std::cout<<"Total Number of Chunks: "<<chunks.size()<<std::endl;
     return chunks;
 }
+

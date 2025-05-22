@@ -36,6 +36,7 @@ if(ANDROID)
 else()
     add_executable(handler_tcp_client
       main.cpp
+      json.hpp
     )
 endif()
 

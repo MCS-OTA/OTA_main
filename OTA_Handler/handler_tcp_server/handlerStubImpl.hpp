@@ -84,6 +84,7 @@ public:
     //     return status_;
     // }
 
+
     private:
     int32_t status_;
     std::ofstream firmwareFile_;
