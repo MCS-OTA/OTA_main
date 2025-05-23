@@ -1,0 +1,11 @@
+[Unit]
+Description=Boot Manager Script
+After=network.target
+
+[Service]
+ExecStart=/home/ota/boot_manager/boot_manager.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

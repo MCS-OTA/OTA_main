@@ -33,21 +33,29 @@ int main(){
 
     // start shell
     if (status == 5){
-        status = 6;
         Service->setStatus(static_cast<int32_t>(HandlerStatus::ACTIVATE));
+        Service->fireHandlerStatusEvent(Service->getStatus());
         int ret = system("sh /home/ota/boot_manager/boot_manager.sh");
         int exitCode = WEXITSTATUS(ret);
         if(exitCode == 0){
             std::cout<<"##### New File Activate Success #####" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
             Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
         }else{
             std::cout <<"%%%%% New File Activate Error %%%%%" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
             Service->setStatus(static_cast<int32_t>(HandlerStatus::ERROR));
         }
     }else{
+        std::cout << "\n\t\tTarget ECU START\n" << std::endl;
         int ret = system("sh /home/ota/boot_manager/simpleStart.sh");
+        int exitCode = WEXITSTATUS(ret);
+        if(exitCode == 0){
+            std::cout <<"##### simpleStart star #####" <<std::endl;
+        }else{
+            std::cerr <<"%%%% simpleStart error %%%%%" <<std::endl;
+        }
     }
-
 
     std::thread statusThread([&Service]() {
         while (true) {
@@ -66,5 +74,8 @@ int main(){
     });
     statusThread.join();
     responseThread.join();
+
+
+
     return 0;
 }

@@ -23,6 +23,48 @@ bool exitFlag = false;
 std::vector<CommonAPI::ByteBuffer> splitIntoChunk(const CommonAPI::ByteBuffer& data, size_t chunkSize);
 
 std::string chunkStatusFilePath_ = "/home/ota/Documents/handler_tcp_client/chunkStatusFile.txt";
+
+CommonAPI::ByteBuffer calculate_cmac(const uint8_t* data, size_t data_len) {
+    CommonAPI::ByteBuffer mac_buffer;
+    
+    EVP_MAC* mac = EVP_MAC_fetch(NULL, "CMAC", NULL);
+    if (!mac) return mac_buffer;
+
+    EVP_MAC_CTX* ctx = EVP_MAC_CTX_new(mac);
+    if(!ctx) {
+        EVP_MAC_free(mac);
+        return mac_buffer;
+    }
+
+    int8_t key[16] = {
+        0x00, 0x01, 0x02, 0x03,
+        0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0A, 0x0B,
+        0x0C, 0x0D, 0x0E, 0x0F
+    };
+
+    OSSL_PARAM params[] = {
+        OSSL_PARAM_construct_utf8_string("cipher", (char*)"AES-128-CBC", 0),
+        OSSL_PARAM_construct_octet_string("key", (void*)key, sizeof(key)),
+        OSSL_PARAM_END
+    };
+
+    //const EVP_CIPHER* cipher = EVP_aes_128_cbc();
+
+    unsigned char mac_tmp[EVP_MAX_BLOCK_LENGTH];
+    size_t mac_len = 0;
+
+    if (EVP_MAC_init(ctx, NULL, 0, params) &&
+        EVP_MAC_update(ctx, reinterpret_cast<const unsigned char*>(data), data_len) &&
+        EVP_MAC_final(ctx, mac_tmp, &mac_len, sizeof(mac_tmp))) {
+            mac_buffer.assign(mac_tmp, mac_tmp + mac_len);
+        }
+
+    EVP_MAC_CTX_free(ctx);
+    EVP_MAC_free(mac);
+    return mac_buffer;
+}
+
 int main(){
     CommonAPI::Runtime::setProperty("LogContext", "E01S");
     CommonAPI::Runtime::setProperty("LogApplication", "E01S");
@@ -272,6 +314,9 @@ int main(){
 
                     // After check all new files, transfer messsage(0x34)
                     if(j["files"].size() == numInDir){
+                        udsRequest = {0x34};
+                        std::string jsonStr = j.dump(4);
+                        udsRequest.insert(udsRequest.end(), jsonStr.begin(), jsonStr.end());
                         std::cout<<numInDir<<"/"<<j["files"].size()<<std::endl;
                         myProxy_inter->updateMsgAsync(udsRequest, 
                             [](const CommonAPI::CallStatus& status, CommonAPI::ByteBuffer result) {
@@ -347,6 +392,12 @@ int main(){
                                         std::cout << "Positive Response 0x" << std::hex << static_cast<int>(result[0]) << std::dec << std::endl;
                                     }
                                 });
+                                std::filesystem::path filepath_List = "./handler_tcp_client/update/list.json";
+                                if(std::filesystem::remove(filepath_List)){
+                                    std::cout<<"list json deleted"<<std::endl;
+                                }else{
+                                    std::cerr<<"list json deleted failed"<<std::endl;
+                                }
                                 break;
                             }
                             else continue;
@@ -367,7 +418,7 @@ int main(){
 
                         std::ifstream file_(filePath, std::ios::binary);
                         CommonAPI::ByteBuffer chunk((std::istreambuf_iterator<char>(file_)), {});
-        
+                        std::cout << "chunk size :" << sizeof(chunk) << " \t" <<chunk.size()<<std::endl;
                         std::vector<CommonAPI::ByteBuffer> chunks = splitIntoChunk(chunk, chunkSize);
                         int32_t total_n = chunks.size();
                         std::cout << total_n <<std::endl;
@@ -379,6 +430,24 @@ int main(){
                             udsRequest.insert(udsRequest.end(), filename.begin(), filename.end());
                             std::cout << "filename: " <<filename<<std::endl;
                             udsRequest.insert(udsRequest.end(), chunks[chunkN].begin(),chunks[chunkN].end());
+
+                            size_t msgLen = sizeof(chunks[chunkN]);
+
+                            CommonAPI::ByteBuffer cmac = calculate_cmac(chunks[chunkN].data(), msgLen);
+                            size_t mac_len = 0;
+                            
+                            // if(!calculate_cmac(chunks[chunkN].data(), msgLen, mac, mac_len)) {
+                            //     std::cerr << "Fail to generate CMAC" << std::endl;
+                            // }
+
+                            std::cout << "CMAC: ";
+                            for (auto byte : cmac) {
+                                std::cout << std::hex <<std::uppercase << static_cast<int>(byte) << " ";
+                            }
+                            std::cout << std::endl;
+
+                            std::cout << "CMAC LEN: " << sizeof(cmac) << ":"<<mac_len<< std::endl;
+                            udsRequest.insert(udsRequest.end(), cmac.begin(), cmac.end());
         
                             CommonAPI::CallStatus callStatus;
                             CommonAPI::ByteBuffer result;
@@ -428,8 +497,15 @@ int main(){
                 break;
             case 5: // READY
                 break;
-            case 6: // ACTIVATE
+            case 6: {// ACTIVATE
+                std::filesystem::path filepath = "./handler_tcp_client/update/list.json";
+                if(std::filesystem::remove(filepath)){
+                    std::cout<<"list json deleted"<<std::endl;
+                }else{
+                    std::cerr<<"list json deleted failed"<<std::endl;
+                }
                 break;
+            }
             case 7: // ERROR
                 std::cout<<"%%%%% Activate Error %%%%%" <<std::endl;
                 break;
@@ -447,13 +523,24 @@ int main(){
 }
 
 std::vector<CommonAPI::ByteBuffer> splitIntoChunk(const CommonAPI::ByteBuffer& data, size_t chunkSize){
+    CommonAPI::ByteBuffer fileData = data;
     std::vector<CommonAPI::ByteBuffer> chunks;
+    if (fileData.size() % chunkSize != 0) {
+        std::cout << "before padded chunk:" <<fileData.size()<<std::endl;
+        int padLen = chunkSize - (fileData.size() % chunkSize);
+        fileData.insert(fileData.end(), padLen-2, static_cast<uint8_t>(0xFF));
+        fileData.push_back(static_cast<uint8_t>(padLen & 0xFF));
+        fileData.push_back(static_cast<uint8_t>(padLen >> 8) & 0xFF);
+    }
+
+    std::cout << "\nAfter padding: " << fileData.size() << std::endl;
+
     size_t offset = 0;
-    size_t totalSize = data.size();
+    size_t totalSize = fileData.size();
 
     while(offset < totalSize){
         size_t currentSize = std::min(chunkSize, totalSize-offset);
-        chunks.emplace_back(data.begin()+offset, data.begin()+offset+currentSize);
+        chunks.emplace_back(fileData.begin()+offset, fileData.begin()+offset+currentSize);
         offset += currentSize;
     }
     std::cout<<"Total Number of Chunks: "<<chunks.size()<<std::endl;

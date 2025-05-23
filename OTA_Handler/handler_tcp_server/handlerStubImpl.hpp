@@ -4,6 +4,7 @@
 #include "HandlerStatus.hpp"
 #include <fstream>
 #include <filesystem>
+#include <json.hpp>
 
 using namespace v0::commonapi;
 
@@ -83,7 +84,8 @@ public:
     //     file.close();
     //     return status_;
     // }
-
+    CommonAPI::ByteBuffer calculate_cmac(const uint8_t* data, size_t data_len);
+    bool verify_message(const uint8_t* data, size_t data_len, const CommonAPI::ByteBuffer& expected_mac);
 
     private:
     int32_t status_;
