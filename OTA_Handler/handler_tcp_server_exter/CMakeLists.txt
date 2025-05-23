@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -13,6 +13,8 @@ set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../install_folder/lib/cmake")
 
 find_package (CommonAPI-SomeIP REQUIRED)
 find_package (vsomeip3 REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(OPENSSL REQUIRED openssl)
 
 #for outer communication
 set(PRJ_SRC_GEN_PATH ../src-gen)
@@ -38,6 +40,7 @@ else()
       main.cpp
       handlerStubImpl.cpp
       handlerStubImpl.hpp
+      json.hpp
     )
 endif()
 
@@ -62,6 +65,17 @@ find_library(VSOMEIP_LIB vsomeip3 PATHS ../install_folder/lib)
 message("COMMONAPI_LIB: ${COMMONAPI_LIB}")
 message("COMMONAPI_SOMEIP_LIB: ${COMMONAPI_SOMEIP_LIB}")
 message("VSOMEIP_LIB: ${VSOMEIP_LIB}")
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-lstdc++fs" HAS_STDCXXFS)
+if (HAS_STDCXXFS)
+    set(FILESYSTEM_LIB stdc++fs)
+else()
+    set(FILESYSTEM_LIB stdc++fs)
+endif()
+
+target_include_directories(handler_tcp_server_exter PRIVATE ${OPENSSL_INCLUDE_DIRS})
+
 # 라이브러리 연결
 target_link_libraries(handler_tcp_server_exter
     PRIVATE
@@ -69,7 +83,8 @@ target_link_libraries(handler_tcp_server_exter
     ${COMMONAPI_SOMEIP_LIB}
     ${VSOMEIP_LIB}
     Threads::Threads
-
+    ${FILESYSTEM_LIB}
+    ${OPENSSL_LIBRARIES}
 )
 
 add_library(${PRJ_NAME}-someip SHARED ${PRJ_SOMEIP_LIB_SRCS})

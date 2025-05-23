@@ -166,8 +166,8 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
                 std::cout << "\n\n\t\tSuccess CMAC Verification\n" << std::endl;
             }
             int padLen = chunk[7998] | (static_cast<uint8_t>(chunk[7999])<<8);
-            std::cout << "chunk[7998]=" <<static_cast<int>(chunk[7998])<<std::endl;
-            std::cout << "chunk[7999]=" <<static_cast<int>(chunk[7999])<<std::endl;
+            // std::cout << "chunk[7998]=" <<static_cast<int>(chunk[7998])<<std::endl;
+            // std::cout << "chunk[7999]=" <<static_cast<int>(chunk[7999])<<std::endl;
 
             //int padLen = static_cast<int>(chunk.back());
             std::cout << "pad len :" <<padLen<< std::endl;
@@ -180,7 +180,6 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
                     std::cerr << "Not padded message" << std::endl;
                     break;
                 }
-                std::cout << "maybe pad # :" << i << std::endl;
                 if (i == chunk.size() - 3){
                     chunk.erase(chunk.begin() + chunk.size() - padLen, chunk.end());
                 }

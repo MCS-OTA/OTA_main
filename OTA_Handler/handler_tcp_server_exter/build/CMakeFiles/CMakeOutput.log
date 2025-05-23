@@ -476,3 +476,19 @@ int main(void)
 }
 
 
+Performing C++ SOURCE FILE Test HAS_STDCXXFS succeeded with the following output:
+Change Dir: /home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/CMakeScratch/TryCompile-7iwgid
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_37f14/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_37f14.dir/build.make CMakeFiles/cmTC_37f14.dir/build
+gmake[1]: Entering directory '/home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/CMakeScratch/TryCompile-7iwgid'
+Building CXX object CMakeFiles/cmTC_37f14.dir/src.cxx.o
+/usr/bin/c++ -DHAS_STDCXXFS  -lstdc++fs -o CMakeFiles/cmTC_37f14.dir/src.cxx.o -c /home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/CMakeScratch/TryCompile-7iwgid/src.cxx
+Linking CXX executable cmTC_37f14
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_37f14.dir/link.txt --verbose=1
+/usr/bin/c++ CMakeFiles/cmTC_37f14.dir/src.cxx.o -o cmTC_37f14 
+gmake[1]: Leaving directory '/home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/CMakeScratch/TryCompile-7iwgid'
+
+
+Source file was:
+int main() { return 0; }
+

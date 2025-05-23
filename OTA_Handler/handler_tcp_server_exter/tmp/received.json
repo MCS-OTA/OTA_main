@@ -1,17 +1,17 @@
 {
     "files": [
         {
-            "name": "green_window",
+            "name": "red_window",
             "status": "0/0",
             "type": "exec"
         },
         {
-            "name": "green_window1",
+            "name": "red_window1",
             "status": "0/0",
             "type": "exec"
         },
         {
-            "name": "gui_Test",
+            "name": "red_Test",
             "status": "0/0",
             "type": "IC"
         }

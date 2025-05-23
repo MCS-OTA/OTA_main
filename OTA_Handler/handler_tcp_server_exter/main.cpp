@@ -24,10 +24,38 @@ int main(){
         successfullyRegistered = runtime->registerService(domain, instance, Service);
     }
 
-    Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
+    //Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
+    int status = Service->getStatus();
+    //if service->status_ == 5; service->ststus_ ++;
 
     std::cout << "Successfully Registered Service!" << std::endl;
     //Service->setStatus(static_cast<int32_t>(HandlerStatus::INIT));
+
+    // start shell
+    if (status == 5){
+        Service->setStatus(static_cast<int32_t>(HandlerStatus::ACTIVATE));
+        Service->fireHandlerStatusExterEvent(Service->getStatus());
+        int ret = system("sh /home/pi/boot_manager/boot_manager.sh");
+        int exitCode = WEXITSTATUS(ret);
+        if(exitCode == 0){
+            std::cout<<"##### New File Activate Success #####" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            Service->setStatus(static_cast<int32_t>(HandlerStatus::IDLE));
+        }else{
+            std::cout <<"%%%%% New File Activate Error %%%%%" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            Service->setStatus(static_cast<int32_t>(HandlerStatus::ERROR));
+        }
+    }else{
+        std::cout << "\n\t\tTarget ECU START\n" << std::endl;
+        int ret = system("sh /home/pi/boot_manager/simpleStart.sh");
+        int exitCode = WEXITSTATUS(ret);
+        if(exitCode == 0){
+            std::cout <<"##### simpleStart star #####" <<std::endl;
+        }else{
+            std::cerr <<"%%%% simpleStart error %%%%%" <<std::endl;
+        }
+    }
 
     std::thread statusThread([&Service]() {
         while (true) {

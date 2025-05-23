@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/pi/Documents/handler_tcp_server_exter/build -I/home/pi/Documents/handler_tcp_server_exter -I/home/pi/Documents/handler_tcp_server_exter/../src-gen -I/home/pi/Documents/handler_tcp_server_exter/../install_folder/include/CommonAPI-3.2 -I/home/pi/Documents/handler_tcp_server_exter/../install_folder/include -I/home/pi/Documents/handler_tcp_server_exter/../install_folder/lib -I/home/pi/Documents/handler_tcp_server_exter/../src-gen/core -I/home/pi/Documents/handler_tcp_server_exter/../src-gen/someip
 
-CXX_FLAGS = -std=gnu++11
+CXX_FLAGS = -std=gnu++17
 
