@@ -1,0 +1,16 @@
+{
+    "files": [
+        {
+            "name": "green_window",
+            "type": "exec"
+        },
+        {
+            "name": "green_window1",
+            "type": "exec"
+        },
+        {
+            "name": "gui_Test",
+            "type": "IC"
+        }
+    ]
+}

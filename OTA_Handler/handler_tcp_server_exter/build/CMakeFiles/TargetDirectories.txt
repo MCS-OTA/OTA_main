@@ -1,0 +1,4 @@
+/home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/handler_tcp_server_exter.dir
+/home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/handler_tcp_server_exter-someip.dir
+/home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/edit_cache.dir
+/home/pi/Documents/handler_tcp_server_exter/build/CMakeFiles/rebuild_cache.dir
