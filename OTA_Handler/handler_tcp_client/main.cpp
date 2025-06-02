@@ -76,22 +76,29 @@ int main(){
     int file_Total = 0;
     int chunkN = 0;
     int chunkTotal = 0;
+
+    // 0 = true, 1 = false
+    int ic = 0;
+    int hu = 1;
+
     std::string domain = "local";
     std::string instance = "commonapi.Handler_msg";
     std::string instance_exter = "commonapi.Handler_msg_exter";
+
     std::shared_ptr<Handler_msgProxy<>> myProxy_inter = runtime->buildProxy<Handler_msgProxy>(domain, instance);
     std::cout << "Checking inter availability!" << std::endl;
-
     std::thread watcher(processListJsonLoop);
 
-    while (!myProxy_inter->isAvailable()){
-        std::this_thread::sleep_for(std::chrono::microseconds(1000));
-        if(counter % 100 == 0)
-            std::cout << "inter not available..."<< counter << std::endl;
-        counter++;
-        if (counter > 10000) {
-            std::cout << "Proxy is not available, exiting..." << std::endl;
-            return -1;
+    if (ic == 0){
+        while (!myProxy_inter->isAvailable()){
+            std::this_thread::sleep_for(std::chrono::microseconds(1000));
+            if(counter % 100 == 0)
+                std::cout << "inter not available..."<< counter << std::endl;
+            counter++;
+            if (counter > 10000) {
+                std::cout << "Proxy is not available, exiting..." << std::endl;
+                return -1;
+            }
         }
     }
 
@@ -118,19 +125,20 @@ int main(){
 
     std::shared_ptr<Handler_msg_exterProxy<>> myProxy_exter = runtime->buildProxy<Handler_msg_exterProxy>(domain, instance_exter);
     std::cout << "Checking exter availability!" << std::endl;
-    
-    while (!myProxy_exter->isAvailable()){
-        std::this_thread::sleep_for(std::chrono::microseconds(1000));    std::string instance_exter = "commonapi.Handler_msg_exter";
 
-        if(counter % 100 == 0)
-            std::cout << "exter not available..."<< counter << std::endl;
-        counter++;
-        if (counter > 10000) {
-            std::cout << "Proxy is not available, exiting..." << std::endl;
-            return -1;
+    if (hu == 0){
+        while (!myProxy_exter->isAvailable()){
+            std::this_thread::sleep_for(std::chrono::microseconds(1000));    
+            std::string instance_exter = "commonapi.Handler_msg_exter";
+            if(counter % 100 == 0)
+                std::cout << "exter not available..."<< counter << std::endl;
+            counter++;
+            if (counter > 10000) {
+                std::cout << "Proxy is not available, exiting..." << std::endl;
+                return -1;
+            }
         }
     }
-
 
 
     std::cout << "Available..." << std::endl;
@@ -242,7 +250,7 @@ int main(){
                 break;
             }
             case 2: {// WAIT
-                int32_t chunkSize = 8000;
+                int32_t chunkSize = 40000;
 
                 // Read update list json file
                 std::ifstream file("./handler_tcp_client/update/HU.json", std::ios::binary);
@@ -524,7 +532,7 @@ int main(){
                 break;
             }
             case 2: {// WAIT
-                int32_t chunkSize = 8000;
+                int32_t chunkSize = 40000;
 
                 // Read update list json file
                 std::ifstream file("./handler_tcp_client/update/IC.json", std::ios::binary);

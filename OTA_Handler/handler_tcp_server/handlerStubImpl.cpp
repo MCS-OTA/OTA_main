@@ -6,6 +6,8 @@
 
 using namespace v0::commonapi;
 using json = nlohmann::json;
+
+int chunkSize = 40000;
 handlerStubImpl::handlerStubImpl() : downloadStarted_(false){
     std::cout << "[Server] HandlerStubImpl called.\n";
     //read undone stauts file
@@ -150,8 +152,8 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
             std::cout<<"# of chunks: "<<n<<std::endl;
 
             // Verify chunk
-            CommonAPI::ByteBuffer chunk(udsMsg.begin() + 4 + fileNameLength, udsMsg.begin() + 4 + fileNameLength + 8000);
-            CommonAPI::ByteBuffer mac(udsMsg.begin() + 4 + fileNameLength + 8000, udsMsg.end());
+            CommonAPI::ByteBuffer chunk(udsMsg.begin() + 4 + fileNameLength, udsMsg.begin() + 4 + fileNameLength + chunkSize);
+            CommonAPI::ByteBuffer mac(udsMsg.begin() + 4 + fileNameLength + chunkSize, udsMsg.end());
             size_t msgLen = sizeof(chunk);
             size_t mac_len = sizeof(mac);
             
@@ -171,7 +173,7 @@ void handlerStubImpl::updateMsg(const std::shared_ptr<CommonAPI::ClientId> _clie
 
             //int padLen = static_cast<int>(chunk.back());
             std::cout << "pad len :" <<padLen<< std::endl;
-            if (padLen == 0 || padLen > 8000 || padLen > chunk.size()) {
+            if (padLen == 0 || padLen > chunkSize || padLen > chunk.size()) {
                 std::cerr << "[ERROR] Incorrect chunk" << std::endl;
             }
 
