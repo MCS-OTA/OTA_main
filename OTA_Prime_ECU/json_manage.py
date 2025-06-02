@@ -155,11 +155,16 @@ class JSON_manager():
                 print("result code ok")
                 if not rollback:
                     self.update_versionList()
+                    so_file = self.find_so_file(build_dir)
                     handler_update_list = {
                         "IC_files": [
                             {
                                 "name": target,
                                 "type": "exec"
+                            },
+                            {
+                                "name": os.path.basename(so_file),
+                                "type": "lib"
                             }
                         ]
                     }
@@ -168,6 +173,7 @@ class JSON_manager():
                         json.dump(handler_update_list, f, indent=4, ensure_ascii=False)
                     try:
                         shutil.copy2(os.path.join(build_dir, target), "/home/ota/Documents/handler_tcp_client/update")
+                        shutil.copy2(so_file, "/home/ota/Documents/handler_tcp_client/update")
                         shutil.copy2(path_handler_update_list, "/home/ota/Documents/handler_tcp_client/update")
                         print(f"Move file Success {path_handler_update_list} ->")
                         pass
@@ -206,3 +212,7 @@ class JSON_manager():
 
         return True
 
+    def find_so_file(self, directory):
+        for filename in os.listdir(directory):
+            if filename.endswith(".so") or ".so." in filename:
+                return os.path.join(directory, filename)

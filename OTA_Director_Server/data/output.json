@@ -1,5 +1,5 @@
 {
-    "version": "0.3.0",
+    "version": "0.35.5",
     "IC_someip": {
         "CMakeLists.txt": {
             "path": "CMakeLists.txt",
@@ -23,7 +23,7 @@
         },
         "main.cpp": {
             "path": "main.cpp",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "batteryupdate.cpp": {
             "path": "batteryupdate.cpp",
@@ -171,83 +171,83 @@
         },
         "car-highlights.png": {
             "path": "images/car-highlights.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "Vector 70.svg": {
             "path": "images/Vector 70.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "iconizer-day-cloudy-icon.svg": {
             "path": "images/iconizer-day-cloudy-icon.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "out_ring.png": {
             "path": "images/out_ring.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "Vector 2.svg": {
             "path": "images/Vector 2.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "lam_logo.jpg": {
             "path": "images/lam_logo.jpg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "ring.svg": {
             "path": "images/ring.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "Vector 1.svg": {
             "path": "images/Vector 1.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "back_ground_bright.png": {
             "path": "images/back_ground_bright.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "iconizer-address-location-icon.svg": {
             "path": "images/iconizer-address-location-icon.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "IC_Screen.png": {
             "path": "images/IC_Screen.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "Ellipse 1.svg": {
             "path": "images/Ellipse 1.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "battery.png": {
             "path": "images/battery.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "iconizer-gas-station-icon.svg": {
             "path": "images/iconizer-gas-station-icon.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "left_green.png": {
             "path": "images/left_green.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "right_green.png": {
             "path": "images/right_green.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "right_origin.png": {
             "path": "images/right_origin.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "iconizer-headphone-icon.svg": {
             "path": "images/iconizer-headphone-icon.svg",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "background_g.png": {
             "path": "images/background_g.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         },
         "left_origin.png": {
             "path": "images/left_origin.png",
-            "version": "0.3.0"
+            "version": "0.35.5"
         }
     }
 }
