@@ -11,9 +11,11 @@ from utils.OTA_GUI import show_update_gui
 from utils.signature.sub_signature import verify_signature
 from utils.signature.pub_signature import make_payload_with_signature
 from json_manage import JSON_manager
+import requests
+import os
 
-brokerIp = "192.168.86.30"
-port = 8883
+brokerIp = "192.168.86.182"
+port = 1883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
 topic_to_server = "file/current_json"
@@ -38,7 +40,6 @@ def check_and_build_function(event):
     while True:
         event.wait()
         print("\n##### Load Update List #####")
-        load_updateList()
         if json_manager.move_original_file_to_tmp():
             print("\n##### Move Original Files to Tmp Success #####")
             if json_manager.move_update_file_to_ws():
@@ -91,6 +92,7 @@ def on_message(client, userdata, msg):
             print("\n##### New Update Exist Notification From Server #####")
             payload_target = msg.payload.decode('utf-8')
             data = json.loads(payload_target)
+            print(data)
             if "directory" in data:
                 json_manager.check_target_is_new(data["directory"])
             else:
@@ -102,16 +104,28 @@ def on_message(client, userdata, msg):
             print("\n##### New Update Files Have Arrived From Server #####")
             try:
                 file_data = json.loads(msg.payload.decode())
-
-                with open("received_update.tar.gz", "wb") as f:
-                    f.write(base64.b64decode(file_data["encoded_files"]))
-                print("\n##### New Zip File Saved")
+                download_url = file_data["url"]
+                print(download_url)
+                try:
+                    response = requests.get(download_url, stream=True)
+                    response.raise_for_status() 
+                    save_path = "received_update.tar.gz"
+                    with open(save_path, "wb") as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                    print(f"File downloaded successfully and saved to: {save_path}")
+                    print(f"Size: {os.path.getsize(save_path)} bytes")
+                    
+                except Exception as e:
+                    print(f"❌ Download failed: {e}")
+                load_updateList()
                 event.set()
             except:
                 print("\n%%%%% New Zip File Save Error %%%%%")
         elif msg.topic == topic_permission_client:
             decoded_payload = json.loads(msg.payload.decode('utf-8'))
             if decoded_payload["reset"]:
+                print("reset statstst")
                 pass
             else:
                 print("\n##### Server Ask For Permission #####")
@@ -158,7 +172,7 @@ if __name__ == "__main__":
 
     # MQTT Client
     client = mqtt.Client()
-    configure_tls(client)
+    #configure_tls(client)
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(brokerIp, port, 60)

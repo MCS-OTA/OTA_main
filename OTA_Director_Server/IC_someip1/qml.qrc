@@ -1,0 +1,42 @@
+<!-- "v0.0.0" -->
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+	<file>images/gauge_bar.png</file>
+	<file>images/gauge_scale.png</file>
+	<file>images/car_back.png</file>
+	<file>images/modeHighlight.png</file>
+	<file>images/green_gauge_left.png</file>
+	<file>images/green_gauge_right.png</file>
+	<file>images/red_gauge_left.png</file>
+	<file>images/red_gauge_right.png</file>
+	<file>IconBar.qml</file>
+	<file>GaugeText.qml</file>
+	<file>GaugeBar.qml</file>
+	<file>DistanceText.qml</file>
+        <file>images/back_ground_bright.png</file>
+        <file>images/background_g.png</file>
+        <file>images/battery.png</file>
+        <file>images/car-highlights.png</file>
+        <file>images/Ellipse 1.svg</file>
+        <file>images/iconizer-address-location-icon.svg</file>
+        <file>images/iconizer-day-cloudy-icon.svg</file>
+        <file>images/iconizer-gas-station-icon.svg</file>
+        <file>images/iconizer-headphone-icon.svg</file>
+        <file>images/out_ring.png</file>
+        <file>images/ring.svg</file>
+        <file>images/Vector 1.svg</file>
+        <file>images/Vector 2.svg</file>
+        <file>images/Vector 70.svg</file>
+        <file>Dial.qml</file>
+        <file>Needle.qml</file>
+        <file>SpeedText.qml</file>
+        <file>images/left_green.png</file>
+        <file>images/left_origin.png</file>
+        <file>images/right_green.png</file>
+        <file>images/right_origin.png</file>
+        <file>images/lam_logo.jpg</file>
+        <file>DialSet.qml</file>
+        <file>images/IC_Screen.png</file>
+    </qresource>
+</RCC>
