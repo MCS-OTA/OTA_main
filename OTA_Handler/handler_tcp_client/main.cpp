@@ -23,7 +23,7 @@ bool exitFlag = false;
 std::vector<CommonAPI::ByteBuffer> splitIntoChunk(const CommonAPI::ByteBuffer& data, size_t chunkSize);
 void processListJsonLoop();
 
-std::string chunkStatusFilePath_ = "/home/ota/Documents/handler_tcp_client/chunkStatusFile.txt";
+std::string chunkStatusFilePath_ = "/opt/OTA_Handler/handler_tcp_client/chunkStatusFile.txt";
 
 CommonAPI::ByteBuffer calculate_cmac(const uint8_t* data, size_t data_len) {
     CommonAPI::ByteBuffer mac_buffer;

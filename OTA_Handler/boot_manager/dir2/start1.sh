@@ -1,8 +1,8 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH=/home/ota/Documents/install_folder/lib:/home/ota/Documents/Instrument-Cluster/IC_someip/v0.0.0/IC_someip/build
-COMMONAPI_CONFIG=/home/ota/Documents/Instrument-Cluster/commonapi4someip.ini
-VSOMEIP_CONFIGURATION=/home/ota/Documents/Instrument-Cluster/json/IC.json
+LD_LIBRARY_PATH=/usr/lib:/opt/OTA_Handler/boot_manager/dir1:/opt/OTA_Handler/boot_manager/dir2
+COMMONAPI_CONFIG=/opt/IC_someip/commonapi4someip.ini
+VSOMEIP_CONFIGURATION=/opt/IC_someip/json/IC.json
 VSOMEIP_APPLICATION_NAME=IC-service
 
 export LD_LIBRARY_PATH
