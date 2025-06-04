@@ -41,10 +41,6 @@ class DirectorRepoHandler:
         client.subscribe(self.received_topic)
 
     def on_message(self, client, userdata, msg):
-        # if not verify_signature(msg.payload):
-        #     print("[DirectorRepo] ❌ Signature verification failed.")
-        #     return
-
         payload = json.loads(msg.payload.decode())
 
         if msg.topic == self.notify_director_topic:

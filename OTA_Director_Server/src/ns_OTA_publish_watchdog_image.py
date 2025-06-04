@@ -43,7 +43,6 @@ class FileHandler:
         self.client_key = "./utils/certs/client.key"
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        #configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
         
         # MQTT 설정
         self.client.on_connect = self.on_connect
@@ -82,92 +81,75 @@ class FileHandler:
         client.subscribe(self.permission_from_client)
         client.subscribe(self.MQTT_NOTIFY_DIRECTOR_TOPIC)
 
-        try:
-            session = client._sock
-            if session:
-                tls_session = session.session
-                session_id = client._sock.session.id  # type: bytes
-                session_hash = hashlib.sha256(session_id).hexdigest()
-
-                print(f"🔐 TLS Session ID: {tls_session.id.hex()}")
-                print(f"🔐 TLS Session ID: {session_id}     ID Hash: {session_hash}")
-        except Exception as e:
-            print(f"⚠️ Failed to retrieve session ID: {e}")
-
     def on_message(self, client, userdata, msg):
-        if verify_signature(msg.payload):
-            payload_data = json.loads(msg.payload.decode('utf-8'))
-            
-            if msg.topic == self.MQTT_NOTIFY_DIRECTOR_TOPIC:
-                print(f"file/current_json: {msg.payload.decode()}")
-                try:
-                    useful_data = {
-                        k: v for k, v in payload_data.items()
-                        if k not in ["timestamp", "signature"]
-                    }
-                    keys = list(useful_data.keys())
-                    if len(keys) >= 2:
-                        target_dir = keys[1]
-                        final_target_path = os.path.join(self.target_path, target_dir)
+        payload_data = json.loads(msg.payload.decode('utf-8'))
+        if msg.topic == self.MQTT_NOTIFY_DIRECTOR_TOPIC:
+            print(f"file/current_json: {msg.payload.decode()}")
+            try:
+                useful_data = {
+                    k: v for k, v in payload_data.items()
+                    if k not in ["timestamp", "signature"]
+                }
+                keys = list(useful_data.keys())
+                if len(keys) >= 2:
+                    target_dir = keys[1]
+                    final_target_path = os.path.join(self.target_path, target_dir)
 
-                    # JSON 데이터를 파일로 저장
-                    with open(self.update_json, "w", encoding="utf-8") as json_file:
-                        json.dump(useful_data, json_file, indent=4, ensure_ascii=False)
+                # JSON 데이터를 파일로 저장
+                with open(self.update_json, "w", encoding="utf-8") as json_file:
+                    json.dump(useful_data, json_file, indent=4, ensure_ascii=False)
 
-                    print("✅ Data saved to '../data/received.json' (cleaned).")
-                    self.json_handler.create_update_tarball(self.update_json, final_target_path, self.output_archive)
+                print("✅ Data saved to '../data/received.json' (cleaned).")
+                self.json_handler.create_update_tarball(self.update_json, final_target_path, self.output_archive)
 
-                except json.JSONDecodeError as e:
-                    print(f"Failed to decode JSON: {e}")
+            except json.JSONDecodeError as e:
+                print(f"Failed to decode JSON: {e}")
 
-                print("=" * 50, "\n\n", "Transfer Update List")
-                #update_message = self.encode_files(self.update_json)
+            print("=" * 50, "\n\n", "Transfer Update List")
+            #update_message = self.encode_files(self.update_json)
 
-                with open(self.update_json, "r") as f:
-                    message = json.load(f)
+            with open(self.update_json, "r") as f:
+                message = json.load(f)
 
-                message["reset"] = False
-                update_payload = make_payload_with_signature(message)
+            message["reset"] = False
+            update_payload = make_payload_with_signature(message)
 
-                try:
-                    result = client.publish(self.permission_to_client, update_payload, qos=1, retain=True)
-                    print("Pulbilsh result:  ", result.rc)
+            try:
+                result = client.publish(self.permission_to_client, update_payload, qos=1, retain=True)
+                print("Pulbilsh result:  ", result.rc)
 
-                except:
-                    print("PUB FAIL")
-                print("permission to client sent")
+            except:
+                print("PUB FAIL")
+            print("permission to client sent")
 
-            elif msg.topic =="permission/server":
-                print("permission/client: ",payload_data["update"])
-                if payload_data["update"]:
-                    print("=" * 50, "\n\n", "Update New Files")
+        elif msg.topic =="permission/server":
+            print("permission/client: ",payload_data["update"])
+            if payload_data["update"]:
+                print("=" * 50, "\n\n", "Update New Files")
 
-                    upload_url = "http://localhost:5000/upload"
-                    with open(self.files_path, 'rb') as f:
-                        files = {'file': ('update.tar.xz', f)}
-                        res = requests.post(upload_url, files=files)
-                    download_url = res.json()['url']
-                    print("📡 Upload complete, download URL:", download_url)
-                    message = {}
-                    message["url"] = download_url
-                    url_payload = make_payload_with_signature(message)
-                    # encoded_files = self.encode_files(self.files_path)
-                    # file_message = {"encoded_files": encoded_files.decode()}
-                    #file_payload = make_payload_with_signature(file_message)
-                    
-                    client.publish(self.MQTT_FILE_TOPIC, url_payload)
-                    
-                    print("=" * 50, "\n\n", "Reset the Broker")
-                    message = {}
-                    message["reset"] = True
-                    reset_payload = make_payload_with_signature(message)
-                    client.publish(self.permission_to_client, reset_payload, qos=1, retain=True)
+                upload_url = "http://localhost:5000/upload"
+                with open(self.files_path, 'rb') as f:
+                    files = {'file': ('update.tar.xz', f)}
+                    res = requests.post(upload_url, files=files)
+                download_url = res.json()['url']
+                print("📡 Upload complete, download URL:", download_url)
+                message = {}
+                message["url"] = download_url
+                url_payload = make_payload_with_signature(message)
+                # encoded_files = self.encode_files(self.files_path)
+                # file_message = {"encoded_files": encoded_files.decode()}
+                #file_payload = make_payload_with_signature(file_message)
+                
+                client.publish(self.MQTT_FILE_TOPIC, url_payload)
+                
+                print("=" * 50, "\n\n", "Reset the Broker")
+                message = {}
+                message["reset"] = True
+                reset_payload = make_payload_with_signature(message)
+                client.publish(self.permission_to_client, reset_payload, qos=1, retain=True)
 
-                else:
-                    pass
-
-        else:
-            print("\n##### Verification Fail #####")
+            else:
+                pass
 
 class FileChangeHandler(FileSystemEventHandler):
     def __init__(self, client, mqtt_notify_topic, watch_dir):
@@ -196,19 +178,6 @@ class FileChangeHandler(FileSystemEventHandler):
 
 
             print("directory_to_json executed.")
-
-
-
-            
-
-def configure_tls(client, ca_cert, client_cert, client_key):
-    client.tls_set(
-        ca_certs= ca_cert,
-        certfile= client_cert,
-        keyfile= client_key,
-        tls_version=ssl.PROTOCOL_TLSv1_2
-    )
-    client.tls_insecure_set(False)
 
 # 사용 예시
 if __name__ == "__main__":

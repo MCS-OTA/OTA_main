@@ -1,8 +1,0 @@
-{
-    "commonapi.IC_inter" : {
-        "service_id": 4661,
-        "instances" : {
-            "commonapi.IC_service_inter": 22137
-        }
-    }
-}
