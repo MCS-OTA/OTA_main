@@ -172,9 +172,9 @@ class JSON_manager():
                     with open(path_handler_update_list,"w", encoding="utf-8") as f:
                         json.dump(handler_update_list, f, indent=4, ensure_ascii=False)
                     try:
-                        shutil.copy2(os.path.join(build_dir, target), "/opt/OTA_Handler/handler_tcp_client/update")
-                        shutil.copy2(so_file, "/opt/OTA_Handler/handler_tcp_client/update")
-                        shutil.copy2(path_handler_update_list, "/opt/OTA_Handler/handler_tcp_client/update")
+                        shutil.copy2(os.path.join(build_dir, target), "/home/ota/Documents/handler_tcp_client/update")
+                        shutil.copy2(so_file, "/home/ota/Documents/handler_tcp_client/update")
+                        shutil.copy2(path_handler_update_list, "/home/ota/Documents/handler_tcp_client/update")
                         print(f"Move file Success {path_handler_update_list} ->")
                         pass
                     except:

@@ -4,6 +4,7 @@ import os
 import time
 import json
 import hashlib
+import ssl
 import paho.mqtt.client as mqtt
 from utils.json_handler import JsonHandler
 from utils.signature.pub_signature import make_payload_with_signature
@@ -23,7 +24,13 @@ class DirectorRepoHandler:
         self.received_json = "../data/received.json"
         self.update_json = "../data/update.json"
 
+        self.ca_cert = "./utils/certs/ca.crt"
+        self.client_cert = "./utils/certs/mqtt_client.crt"
+        self.client_key = "./utils/certs/mqtt_client.key"
+
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
+
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
 
@@ -83,8 +90,17 @@ class DirectorRepoHandler:
             except Exception as e:
                 print(f"[DirectorRepo] Failed to create/send update.json: {e}")
 
+def configure_tls(client, ca_cert, client_cert, client_key):
+    client.tls_set(
+        ca_certs= ca_cert,
+        certfile= client_cert,
+        keyfile= client_key,
+        tls_version=ssl.PROTOCOL_TLSv1_2
+    )
+    client.tls_insecure_set(False)
+
 if __name__ == "__main__":
-    handler = DirectorRepoHandler("192.168.86.115", 1883)
+    handler = DirectorRepoHandler("192.168.86.22", 8883)
     handler.connect_mqtt()
     handler.loop_mqtt()
 

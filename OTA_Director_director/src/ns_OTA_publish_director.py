@@ -80,7 +80,7 @@ class DirectorRepoHandler:
                 print(f"[DirectorRepo] Failed to create/send update.json: {e}")
 
 if __name__ == "__main__":
-    handler = DirectorRepoHandler("192.168.86.115", 1883)
+    handler = DirectorRepoHandler("192.168.86.22", 1883)
     handler.connect_mqtt()
     handler.loop_mqtt()
 

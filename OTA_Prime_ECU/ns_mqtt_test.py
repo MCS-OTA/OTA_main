@@ -14,7 +14,7 @@ from json_manage import JSON_manager
 import requests
 import os
 
-brokerIp = "192.168.86.182"
+brokerIp = "192.168.86.22"
 port = 1883
 topic_from_server_notify = "file/added"
 topic_from_server_files = "file/files"
@@ -94,7 +94,7 @@ def on_message(client, userdata, msg):
             download_url = file_data["url"]
             print(download_url)
             try:
-                response = requests.get(download_url, stream=True)
+                response = requests.get(download_url, stream=True, verify=False)#"./utils/certs/https_server.crt")
                 response.raise_for_status() 
                 save_path = "received_update.tar.gz"
                 with open(save_path, "wb") as f:
@@ -120,8 +120,6 @@ def on_message(client, userdata, msg):
                 
     else:
         print("invalid topic")
-
-
 
 def ask_update_permission(client):
     def yes_callback():

@@ -39,11 +39,11 @@ class FileHandler:
         self.output_archive = "../data/update.tar.xz"
 
         self.ca_cert = "./utils/certs/ca.crt"
-        self.client_cert = "./utils/certs/client.crt"
-        self.client_key = "./utils/certs/client.key"
+        self.client_cert = "./utils/certs/mqtt_client.crt"
+        self.client_key = "./utils/certs/mqtt_client.key"
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        #configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
+        configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
         
         # MQTT 설정
         self.client.on_connect = self.on_connect
@@ -142,10 +142,10 @@ class FileHandler:
                 if payload_data["update"]:
                     print("=" * 50, "\n\n", "Update New Files")
 
-                    upload_url = "http://localhost:5000/upload"
+                    upload_url = "https://localhost:443/upload"
                     with open(self.files_path, 'rb') as f:
                         files = {'file': ('update.tar.xz', f)}
-                        res = requests.post(upload_url, files=files)
+                        res = requests.post(upload_url, files=files, verify="./utils/certs/https_server.crt")
                     download_url = res.json()['url']
                     print("📡 Upload complete, download URL:", download_url)
                     message = {}
@@ -223,22 +223,23 @@ if __name__ == "__main__":
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
         print(f"✅ File saved at: {filepath} ({os.path.getsize(filepath)} bytes)")
-        return {"url": f"http://192.168.86.115:5000/download/{file.filename}"}, 200
+        return {"url": f"https://192.168.86.115:443/download/{file.filename}"}, 200
 
     @app.route('/download/<filename>', methods=['GET'])
     def download_file(filename):
         return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
     # ===== Flask 서버를 백그라운드 스레드로 실행 =====
     def run_server():
-        app.run(host="0.0.0.0", port=5000)
+        context = ('./utils/certs/https_server.crt', './utils/certs/https_server.key')
+        app.run(host="0.0.0.0", port=443, ssl_context=context)
     # ================================= Flask 서버 설정 끝 =================================
 
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
 
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.115"  # 또는 MQTT 서버 IP
-    MQTT_PORT = 1883
+    MQTT_BROKER = "192.168.86.22"  # 또는 MQTT 서버 IP
+    MQTT_PORT = 8883
 
     # 감시할 디렉토리 설정
     WATCH_DIR = "../src_add"  # 감시할 폴더 경로 변경 필요
