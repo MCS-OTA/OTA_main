@@ -1,7 +1,7 @@
-// "v0.0.0"
+// "v0.2.0"
 import QtQuick 2.12
 import QtQuick.Window 2.12
-import QtQuick.Controls 1.2
+import QtQuick.Controls 2.15
 import com.DESInstrumentClusterTeam7.speedometer 1.0
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.12

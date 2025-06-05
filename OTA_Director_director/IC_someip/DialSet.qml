@@ -1,6 +1,6 @@
-// "v0.0.0"
+// "v0.1.0"
 import QtQuick 2.0
-import QtQuick.Controls 1.2
+import QtQuick.Controls 2.15
 import "."
 Item {
     id: dialSet

@@ -126,7 +126,7 @@ void handlerExterStubImpl::updateMsgExter(const std::shared_ptr<CommonAPI::Clien
             // }
             std::string jsonStr = std::string(udsMsg.begin() + 1,udsMsg.end());
             json j = json::parse(jsonStr);
-            std::ofstream out("/home/pi/Documents/handler_tcp_server_exter/tmp/received.json");
+            std::ofstream out("/opt/OTA_Handler/handler_tcp_server_exter/tmp/received.json");
             out <<j.dump(4);
             out.close();
             downloadStarted_ = true;
@@ -259,7 +259,7 @@ void handlerExterStubImpl::updateMsgExter(const std::shared_ptr<CommonAPI::Clien
             }                
             std::filesystem::path baseDir = std::filesystem::current_path();
             std::filesystem::path interDir = "handler_tcp_server_exter/tmp";
-            std::string targetDir = extractDirFromJson("/home/pi/boot_manager/status.json", 4);
+            std::string targetDir = extractDirFromJson("/opt/OTA_Handler/boot_manager/status.json", 4);
             std::string targetDirPath = "";
 
             baseDir = baseDir / interDir;
@@ -271,7 +271,7 @@ void handlerExterStubImpl::updateMsgExter(const std::shared_ptr<CommonAPI::Clien
                         continue;
                     }
                     std::filesystem::path filePath = baseDir / filename;
-                    targetDirPath = "/home/pi/boot_manager/" + targetDir +"/"+ filename;
+                    targetDirPath = "/opt/OTA_Handler/boot_manager/" + targetDir +"/"+ filename;
                     moveFile(filePath.string(),targetDirPath);
                     targetDirPath = "";
                 }

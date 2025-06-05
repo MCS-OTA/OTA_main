@@ -156,8 +156,12 @@ class JSON_manager():
                 if not rollback:
                     self.update_versionList()
                     so_file = self.find_so_file(build_dir)
+                    if target == "IC_someip":
+                        target_ecu = "IC_files"
+                    elif target == "Head_Unit_app" or target == "HU_App":
+                        target_ecu = "HU_files"
                     handler_update_list = {
-                        "IC_files": [
+                        target_ecu: [
                             {
                                 "name": target,
                                 "type": "exec"

@@ -95,7 +95,7 @@
         },
         "DialSet.qml": {
             "path": "DialSet.qml",
-            "version": "0.0.0"
+            "version": "0.2.0"
         },
         "lrsign.h": {
             "path": "lrsign.h",
@@ -107,7 +107,7 @@
         },
         "main.qml": {
             "path": "main.qml",
-            "version": "0.0.0"
+            "version": "0.2.0"
         },
         "CMakeLists.txt.user.6562083": {
             "path": "CMakeLists.txt.user.6562083",

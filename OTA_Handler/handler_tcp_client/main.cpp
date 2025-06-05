@@ -79,7 +79,7 @@ int main(){
 
     // 0 = true, 1 = false
     int ic = 0;
-    int hu = 1;
+    int hu = 0;
 
     std::string domain = "local";
     std::string instance = "commonapi.Handler_msg";
