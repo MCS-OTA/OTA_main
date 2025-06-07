@@ -1,0 +1,5 @@
+yocto/build/sstate-cache
+yocto/build/tmp
+yocto/source-mirrors
+yocto/build/downloads
+yocto/build/cache
