@@ -1,0 +1,19 @@
+{
+    "files": [
+        {
+            "name": "red_window",
+            "status": "0/0",
+            "type": "exec"
+        },
+        {
+            "name": "red_window1",
+            "status": "0/0",
+            "type": "exec"
+        },
+        {
+            "name": "red_Test",
+            "status": "0/0",
+            "type": "IC"
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+import "platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-4-SOMEIP_deployment_spec.fdepl"
+import "tcp_test.fidl"
+
+define org.genivi.commonapi.someip.deployment for interface commonapi.tcp_test {
+    SomeIpServiceID = 4660
+
+    method sayHello {
+        SomeIpMethodID = 30000
+        SomeIpReliable = true
+        
+        in {
+            name {
+                SomeIpStringEncoding = utf16le
+            }
+        }
+    }
+}
+
+define org.genivi.commonapi.someip.deployment for provider as Service_inter {
+    instance commonapi.tcp_test {
+        InstanceId = "commonapi.tcp_test"
+        SomeIpInstanceID = 4660
+        SomeIpUnicastAddress = "127.0.0.1"
+    }
+}

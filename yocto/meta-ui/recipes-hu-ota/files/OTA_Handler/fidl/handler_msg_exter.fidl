@@ -1,0 +1,20 @@
+package commonapi
+
+interface Handler_msg_exter{
+    version { major 0 minor 1}
+    
+    method updateMsgExter {
+        in {
+            ByteBuffer udsRequest
+        }
+        out {
+            ByteBuffer udsResponse
+        }
+    }
+
+    broadcast handlerStatusExter {
+        out {
+            Int32 statusCode
+        }
+    }
+}

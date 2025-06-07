@@ -1,0 +1,8 @@
+{
+    "commonapi.Handler_msg_exter" : {
+        "service_id": 4663,
+        "instances" : {
+            "commonapi.Handler_msg_exter": 22139
+        }
+    }
+}

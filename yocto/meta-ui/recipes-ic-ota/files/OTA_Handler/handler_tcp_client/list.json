@@ -1,0 +1,30 @@
+{
+    "IC_files": [
+	{
+	    "name": "green_window",
+	    "type": "exec"
+	},
+	{
+	    "name": "green_window1",
+	    "type": "exec"
+	},
+	{
+	    "name": "gui_Test",
+	    "type": "IC"
+	}
+    ],
+    "HU_files": [
+	{
+	    "name": "red_window",
+	    "type": "exec"
+	},
+	{
+	    "name": "red_window1",
+	    "type": "exec"
+	},
+	{
+	    "name": "red_Test",
+	    "type": "IC"
+	}
+    ]
+}

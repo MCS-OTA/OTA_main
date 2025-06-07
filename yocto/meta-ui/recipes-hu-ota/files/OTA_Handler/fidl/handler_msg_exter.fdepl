@@ -1,0 +1,26 @@
+import "platform:/plugin/org.genivi.commonapi.someip/deployment/CommonAPI-4-SOMEIP_deployment_spec.fdepl"
+
+import "handler_msg_exter.fidl"
+
+define org.genivi.commonapi.someip.deployment for interface commonapi.Handler_msg_exter{
+    SomeIpServiceID = 4663
+
+    method updateMsgExter{
+        SomeIpMethodID = 33000
+        SomeIpReliable = true
+    }
+
+    broadcast handlerStatusExter {
+        SomeIpEventID = 40200
+        SomeIpEventGroups = { 33200 }
+        SomeIpReliable = true
+    }
+}
+
+define org.genivi.commonapi.someip.deployment for provider as myService{
+    instance commonapi.Handler_msg_exter{
+        InstanceId = "commonapi.Handler_msg_exter"
+        SomeIpInstanceID = 22139
+        SomeIpEventGroups = { 33200 }
+    }
+}

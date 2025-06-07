@@ -1,0 +1,15 @@
+package commonapi
+
+interface OTA_exter{
+    version { major 0 minor 1}
+    
+    method pushUpdate_exter {
+        in {
+            ByteBuffer firmware
+            ByteBuffer signature
+        }
+        out {
+            Int32 result
+        }
+    }
+}
