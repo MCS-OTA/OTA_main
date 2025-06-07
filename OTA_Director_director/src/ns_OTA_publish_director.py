@@ -52,7 +52,7 @@ class DirectorRepoHandler:
             message = {"event": "directory_added", "directory": payload["directory"]}
 
             notify_payload = make_payload_with_signature(message)
-            client.publish(self.notify_client_topic, notify_payload)
+            client.publish(self.notify_client_topic, notify_payload, qos=1)
 
         elif msg.topic == self.received_topic:
             print("[DirectorRepo] Received received.json from client.")
@@ -73,7 +73,7 @@ class DirectorRepoHandler:
                     with open(self.update_json, "r") as f:
                         update_data = json.load(f)
                     update_payload = make_payload_with_signature(update_data)
-                    client.publish(self.update_publish_topic, update_payload)
+                    client.publish(self.update_publish_topic, update_payload, qos=1)
                     print("[DirectorRepo] update.json sent to image repo.")
 
             except Exception as e:

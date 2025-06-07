@@ -6,6 +6,7 @@ import json
 import tarfile
 import ssl
 import hashlib
+from ecdsa import VerifyingKey, BadSignatureError
 import paho.mqtt.client as mqtt
 from utils.OTA_GUI import show_update_gui
 from utils.signature.sub_signature import verify_signature
@@ -21,6 +22,10 @@ topic_from_server_files = "file/files"
 topic_to_server = "file/current_json"
 topic_permission_client = "permission/client"
 topic_permission_server = "permission/server"
+topic_versionList = "primary/version"
+topic_requestImage = "primary/requestMeta"
+topic_updateList = "director/updateMeta"
+topic_imageMeta = "image/metaData"
 unzip_path = "updateFiles"
 json_manager = JSON_manager()
 
@@ -84,54 +89,92 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(topic_from_server_notify)
     client.subscribe(topic_from_server_files)
     client.subscribe(topic_permission_client)
+    client.subscribe(topic_updateList)
+    client.subscribe(topic_imageMeta)
 
 
 def on_message(client, userdata, msg):
-    if msg.topic == topic_from_server_notify:
-        print("\n##### New Update Exist Notification From Server #####")
-        payload_target = msg.payload.decode('utf-8')
-        data = json.loads(payload_target)
-        print(data)
-        if "directory" in data:
-            json_manager.check_target_is_new(data["directory"])
-        else:
-            print("\n%%%%% There is No Target Name in MQTT MSG %%%%%")
-            return
-        version_payload = make_payload_with_signature(json_manager.versionList)
-        client.publish(topic_to_server, version_payload, qos=1)
-    elif msg.topic == topic_from_server_files:
-        print("\n##### New Update Files Have Arrived From Server #####")
-        try:
-            file_data = json.loads(msg.payload.decode())
-            download_url = file_data["url"]
-            print(download_url)
-            try:
-                response = requests.get(download_url, stream=True, verify=False)
-                response.raise_for_status() 
-                save_path = "received_update.tar.gz"
-                with open(save_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
-                print(f"File downloaded successfully and saved to: {save_path}")
-                print(f"Size: {os.path.getsize(save_path)} bytes")
-                
-            except Exception as e:
-                print(f"❌ Download failed: {e}")
-            load_updateList()
-            event.set()
-        except:
-            print("\n%%%%% New Zip File Save Error %%%%%")
-    elif msg.topic == topic_permission_client:
-        decoded_payload = json.loads(msg.payload.decode('utf-8'))
-        if decoded_payload["reset"]:
-            print("reset statstst")
-            pass
-        else:
-            print("\n##### Server Ask For Permission #####")
-            ask_update_permission(client)
-                
+    if verify_signature(msg.payload):
+        payload = json.loads(msg.payload.decode())
+
+        if msg.topic == topic_updateList:
+            print("\nReceive Update List from Director Repo\n")
+
+            update_path = "./update_target.json"
+            with open(update_path, "w") as f:
+                json.dump(payload, f, indent=4)
+
+            print("\nSave the update list\n")
+
+            request_payload = make_payload_with_signature({"request": True})
+            client.publish(topic_requestImage, request_payload, qos=1)
+
+        elif msg.topic == topic_imageMeta:
+            print("\nReceive Metadata from Image Repo\n")
+
+            meta_path = "./image_target.json"
+            with open(meta_path, "w") as f:
+                json.dump(payload, f, indent=4)
+
+            print("\nSave the meta data\n")
+
+            with open("./update_target.json", "r", encoding="utf-8") as f:
+                director_data = json.load(f)
+
+            with open("./image_target.json", "r", encoding="utf-8") as f:
+                image_data = json.load(f)
+
+
+            for directory, files in director_data.items():
+                if directory in ["version", "url", "timestamp", "signature"]:
+                    continue
+
+                print(f"\nUpdate Directory: {directory}")
+                image_files = image_data.get(directory, {})
+                director_hash = None
+                image_hash = None
+                print(f"\nFiles:    {files}")
+
+                for filename, info in files.items():
+                    with open("./utils/signature/director_public.pem", "rb") as f:
+                        vk = VerifyingKey.from_pem(f.read())
+
+                    hash_bytes = base64.b64decode(info["sha256"])
+                    signature_bytes = base64.b64decode(info["signature"])
+                    
+                    try:
+                        vk.verify(signature_bytes, hash_bytes)
+                        director_hash = hash_bytes
+                        print("\n##### Director Signature verified successfully. #####")
+                    except BadSignatureError:
+                        print("\n%%%%%% Director Signature verification failed: Bad signature. %%%%%")   
+
+                    image_file = image_files.get(filename)
+
+                    if image_file:
+                        with open("./utils/signature/image_public.pem", "rb") as f:
+                            vk = VerifyingKey.from_pem(f.read())
+
+                        hash_bytes = base64.b64decode(image_file["sha256"])
+                        signature_bytes = base64.b64decode(image_file["signature"])
+                        
+                        try:
+                            vk.verify(signature_bytes, hash_bytes)
+                            image_hash = hash_bytes
+                            print("\n##### Image Signature verified successfully. #####")
+                        except BadSignatureError:
+                            print("\n%%%%%% Image Signature verification failed: Bad signature. %%%%%")
+
+                        if director_hash == image_hash:
+                            print("\nIntegrity is right\n")
+                        else:
+                            print(f"\nFail to integrity test: {filename}\n")
+
+                    else:
+                        print(f"\nThis file is not in Image Repo: {filename}")
+
     else:
-        print("invalid topic")
+        print("\n##### Verification Fail #####\n")
 
 
 
@@ -175,6 +218,17 @@ if __name__ == "__main__":
     client.connect(brokerIp, port, 60)
     clear_retained_message(client, topic_permission_client)
     client.loop_start()
+
+    try:
+        with open("./versionList.json", "r") as f:
+            data = json.load(f)
+        print(f"Version List load OK")
+    except Exception as e:
+        print(f"Version List load Error:    {e}")
+    
+    verList_payload = make_payload_with_signature(data)
+    client.publish(topic_versionList, verList_payload, qos=1)
+    print("\nSend Current Version\n")
 
     # Main thread 유지용 (대기)
     try:

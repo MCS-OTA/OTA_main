@@ -155,7 +155,7 @@ class FileHandler:
                     # file_message = {"encoded_files": encoded_files.decode()}
                     #file_payload = make_payload_with_signature(file_message)
                     
-                    client.publish(self.MQTT_FILE_TOPIC, url_payload)
+                    client.publish(self.MQTT_FILE_TOPIC, url_payload, qos=2)
                     
                     print("=" * 50, "\n\n", "Reset the Broker")
                     message = {}
@@ -192,7 +192,7 @@ class FileChangeHandler(FileSystemEventHandler):
                 data = json.load(f)
             message = {"event": "directory_added", "directory": foldername, "file": data}
             notify_payload = make_payload_with_signature(message)
-            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload)
+            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload, qos=1)
 
 
             print("directory_to_json executed.")

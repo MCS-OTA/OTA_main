@@ -2,6 +2,7 @@ import os
 import time
 import json
 import base64
+import hashlib
 import tarfile
 import shutil
 import re
@@ -56,6 +57,77 @@ class JsonHandler:
 
         for img in image_files:
             result[img] = {"path": image_files[img]["fpath"], "version": max_version}
+
+        final_result = {
+            "version": max_version,
+            base_dir: result
+        }
+        
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(final_result, f, indent=4, ensure_ascii=False)
+        print("total number of files : ",num_file)
+
+    def target_to_inventory_json(self, root_dir, output_file):
+        result = {}
+        base_dir = os.path.basename(root_dir)
+        max_version = "0.0.0"
+        num_file = 0
+        image_files = {}
+
+        for dirpath, _, filenames in os.walk(root_dir):
+            if "build" in dirpath.split(os.sep):
+                continue
+            
+            for filename in filenames:
+                if filename == "CMakeLists.txt.user":
+                    continue
+                
+                rel_path = os.path.relpath(os.path.join(dirpath, filename), root_dir)
+                file_path = os.path.join(dirpath, filename)
+                
+                if filename.lower().endswith((".jpg", ".png", ".svg")):
+                    image_files[filename] = {"fpath": rel_path, "fname": filename}
+                    
+                else:
+                    try:
+                        version = self.extract_version_from_text(file_path)
+                        num_file += 1
+                    except:
+                        print("extract version from text error : ", file_path)
+                result[filename] = {"path": rel_path, "version": version}
+                
+                try:
+                    with open(file_path, "rb") as f:
+                        content = f.read()
+
+                    file_hash = hashlib.sha256(content).digest()
+                    result[filename]["sha256"] = base64.b64encode(file_hash).decode("utf-8")
+                    print(f"Hash:  {filename}")
+
+                except Exception as e:
+                    print(f"Error in {filename}:   {e}")
+
+                if self.compare_versions(version, max_version):
+                    max_version = version
+
+        for img in image_files:
+            # result[img] = {"path": image_files[img]["fpath"], "version": max_version}
+            result[img]["path"] = image_files[img]["fpath"]
+            result[img]["version"] = max_version
+
+            try:
+                with open(file_path, "rb") as f:
+                    content = f.read()
+
+                file_hash = hashlib.sha256(content).digest()
+                result[filename]["sha256"] = base64.b64encode(file_hash).decode("utf-8")
+                print(f"Hash:  {filename}")
+
+            except Exception as e:
+                print(f"Error in {filename}:   {e}")
+            
+            if self.compare_versions(version, max_version):
+                max_version = version
 
         final_result = {
             "version": max_version,
