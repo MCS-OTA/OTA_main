@@ -82,6 +82,10 @@ class JsonHandler:
         }
 
         # 업데이트 디렉터리 항목 비교
+        if target_dir not in output_data.keys():
+            print(f"\nThis directory is not in update: {target_dir}")
+            return 0
+
         for filename, output_file_info in output_data[target_dir].items():
             if filename in received_data[target_dir]:
                 received_file_info = received_data[target_dir][filename]
@@ -98,6 +102,7 @@ class JsonHandler:
             json.dump(update_data, f, indent=4, ensure_ascii=False)
 
         print(f"Comparison completed. Changes have been saved to '{update_json}'.")
+        return 1
 
 
     def create_update_tarball(self, update_json_path, source_dir, output_archive):

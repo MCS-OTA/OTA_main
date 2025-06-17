@@ -11,7 +11,7 @@ port = 1883
 
 json_file = "./receive_signature.json"
 
-TIME_THRESHOLD = 10
+TIME_THRESHOLD =300
 
 def verify_signature(payload):
     try:        
@@ -28,7 +28,9 @@ def verify_signature(payload):
             return False
         
         current_time = datetime.fromisoformat(datetime.now(timezone.utc).isoformat())
+        print(f"\nCurrent Time:     {current_time}")
         timestamp = datetime.fromisoformat(timestamp)
+        print(f"Time stamp:     {timestamp}")
     
         time_diff = current_time - timestamp
         if time_diff.total_seconds() > TIME_THRESHOLD:

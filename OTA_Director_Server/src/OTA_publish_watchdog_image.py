@@ -161,7 +161,7 @@ class FileHandler:
                     message = {}
                     message["reset"] = True
                     reset_payload = make_payload_with_signature(message)
-                    client.publish(self.permission_to_client, reset_payload, qos=1, retain=True)
+                    client.publish(self.permission_to_client, reset_payload, qos=0, retain=True)
 
                 else:
                     pass
@@ -192,7 +192,7 @@ class FileChangeHandler(FileSystemEventHandler):
                 data = json.load(f)
             message = {"event": "directory_added", "directory": foldername, "file": data}
             notify_payload = make_payload_with_signature(message)
-            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload, qos=1)
+            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload, qos=0)
 
 
             print("directory_to_json executed.")
@@ -238,11 +238,11 @@ if __name__ == "__main__":
     server_thread.start()
 
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.22"  # 또는 MQTT 서버 IP
+    MQTT_BROKER = "192.168.86.37"  # 또는 MQTT 서버 IP
     MQTT_PORT = 8883
 
     # 감시할 디렉토리 설정
-    WATCH_DIR = "../src_add"  # 감시할 폴더 경로 변경 필요
+    WATCH_DIR = "./src_add"  # 감시할 폴더 경로 변경 필요
 
     # 파일 경로 및 MQTT 클라이언트 설정
     files_path = "../data/update.tar.xz"

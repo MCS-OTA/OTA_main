@@ -115,7 +115,7 @@ class FileHandler:
             update_payload = make_payload_with_signature(message)
 
             try:
-                result = client.publish(self.permission_to_client, update_payload, qos=1, retain=True)
+                result = client.publish(self.permission_to_client, update_payload, qos=0, retain=True)
                 print("Pulbilsh result:  ", result.rc)
 
             except:
@@ -127,10 +127,10 @@ class FileHandler:
             if payload_data["update"]:
                 print("=" * 50, "\n\n", "Update New Files")
 
-                upload_url = "https://localhost:5000/upload"
+                upload_url = "http://localhost:5000/upload"
                 with open(self.files_path, 'rb') as f:
                     files = {'file': ('update.tar.xz', f)}
-                    res = requests.post(upload_url, files=files, verify='./utils/certs/https_server.crt')
+                    res = requests.post(upload_url, files=files)
                 download_url = res.json()['url']
                 print("📡 Upload complete, download URL:", download_url)
                 message = {}
@@ -140,13 +140,13 @@ class FileHandler:
                 # file_message = {"encoded_files": encoded_files.decode()}
                 #file_payload = make_payload_with_signature(file_message)
                 
-                client.publish(self.MQTT_FILE_TOPIC, url_payload)
+                client.publish(self.MQTT_FILE_TOPIC, url_payload, qos=0)
                 
                 print("=" * 50, "\n\n", "Reset the Broker")
                 message = {}
                 message["reset"] = True
                 reset_payload = make_payload_with_signature(message)
-                client.publish(self.permission_to_client, reset_payload, qos=1, retain=True)
+                client.publish(self.permission_to_client, reset_payload, qos=0, retain=True)
 
             else:
                 pass
@@ -174,7 +174,7 @@ class FileChangeHandler(FileSystemEventHandler):
                 data = json.load(f)
             message = {"event": "directory_added", "directory": foldername, "file": data}
             notify_payload = make_payload_with_signature(message)
-            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload)
+            self.client.publish(self.MQTT_NOTIFY_TOPIC, notify_payload, qos=0)
 
 
             print("directory_to_json executed.")
@@ -192,26 +192,26 @@ if __name__ == "__main__":
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
         print(f"✅ File saved at: {filepath} ({os.path.getsize(filepath)} bytes)")
-        return {"url": f"https://192.168.86.22:5000/download/{file.filename}"}, 200
+        return {"url": f"http://192.168.86.115:5000/download/{file.filename}"}, 200
 
     @app.route('/download/<filename>', methods=['GET'])
     def download_file(filename):
         return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
     # ===== Flask 서버를 백그라운드 스레드로 실행 =====
     def run_server():
-        context = ('./utils/certs/https_server.crt', './utils/certs/https_server.key')
-        app.run(host="0.0.0.0", port=5000, ssl_context=context)
+        # context = ('./utils/certs/https_server.crt', './utils/certs/https_server.key')
+        app.run(host="0.0.0.0", port=5000)
     # ================================= Flask 서버 설정 끝 =================================
 
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
 
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.22"  # 또는 MQTT 서버 IP
+    MQTT_BROKER = "192.168.86.37"  # 또는 MQTT 서버 IP
     MQTT_PORT = 1883
 
     # 감시할 디렉토리 설정
-    WATCH_DIR = "../src_add"  # 감시할 폴더 경로 변경 필요
+    WATCH_DIR = "./src_add"  # 감시할 폴더 경로 변경 필요
 
     # 파일 경로 및 MQTT 클라이언트 설정
     files_path = "../data/update.tar.xz"

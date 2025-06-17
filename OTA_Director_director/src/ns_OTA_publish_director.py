@@ -52,7 +52,7 @@ class DirectorRepoHandler:
             message = {"event": "directory_added", "directory": payload["directory"]}
 
             notify_payload = make_payload_with_signature(message)
-            client.publish(self.notify_client_topic, notify_payload, qos=1)
+            client.publish(self.notify_client_topic, notify_payload, qos=0)
 
         elif msg.topic == self.received_topic:
             print("[DirectorRepo] Received received.json from client.")
@@ -73,14 +73,14 @@ class DirectorRepoHandler:
                     with open(self.update_json, "r") as f:
                         update_data = json.load(f)
                     update_payload = make_payload_with_signature(update_data)
-                    client.publish(self.update_publish_topic, update_payload, qos=1)
+                    client.publish(self.update_publish_topic, update_payload, qos=0)
                     print("[DirectorRepo] update.json sent to image repo.")
 
             except Exception as e:
                 print(f"[DirectorRepo] Failed to create/send update.json: {e}")
 
 if __name__ == "__main__":
-    handler = DirectorRepoHandler("192.168.86.22", 1883)
+    handler = DirectorRepoHandler("192.168.86.37", 1883)
     handler.connect_mqtt()
     handler.loop_mqtt()
 

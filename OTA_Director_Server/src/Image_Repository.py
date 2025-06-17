@@ -93,7 +93,7 @@ class FileHandler:
 
                 upload_url = "https://localhost:443/upload"
                 with open(self.files_path, 'rb') as f:
-                    files = {'file': ('update.tar.xz', f)}
+                    files = {'file': ('update_image.tar.xz', f)}
                     res = requests.post(upload_url, files=files, verify="./utils/certs/https_server.crt")
                 download_url = res.json()['url']
                 print("📡 Upload complete, download URL:", download_url)
@@ -149,10 +149,16 @@ class FileChangeHandler(FileSystemEventHandler):
                     except Exception as e:
                         print(f"Error in {file_name}:   {e}")
 
+                print("\nSuccess Sign all files")
+
             with open("./data/target_image.json", "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
 
-            print("\nSuccess Sign all files")
+            created_dir = self.watch_dir #event.src_path
+            output_tar_path = "./data/update_image.tar.xz"
+
+            #compress_dir_path = os.path.join("../Image_Repo/", )
+            self.json_handler.create_new_update_tarball("./data/target_image.json", created_dir, output_tar_path)
 
             
 
@@ -193,14 +199,14 @@ if __name__ == "__main__":
     server_thread.start()
 
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.22"  # 또는 MQTT 서버 IP
+    MQTT_BROKER = "192.168.86.37"  # 또는 MQTT 서버 IP
     MQTT_PORT = 8883
 
     # 감시할 디렉토리 설정
     WATCH_DIR = "../Image_Repo"  # 감시할 폴더 경로 변경 필요
 
     # 파일 경로 및 MQTT 클라이언트 설정
-    files_path = "../data/update.tar.xz"
+    files_path = "./data/update_image.tar.xz"
     
     # 파일 처리 객체 생성 및 MQTT 연결
     file_handler = FileHandler(MQTT_BROKER, MQTT_PORT, WATCH_DIR, files_path)
