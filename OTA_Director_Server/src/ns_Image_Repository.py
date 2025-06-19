@@ -32,7 +32,7 @@ class FileHandler:
         self.client_key = "./utils/certs/mqtt_client.key"
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
+        #configure_tls(self.client, self.ca_cert, self.client_cert, self.client_key)
         
         # MQTT 설정
         self.client.on_connect = self.on_connect
@@ -69,17 +69,17 @@ class FileHandler:
         print(f"Connected: {rc}")
         client.subscribe(self.MQTT_REQUEST_TOPIC)
 
-        try:
-            session = client._sock
-            if session:
-                tls_session = session.session
-                session_id = client._sock.session.id  # type: bytes
-                session_hash = hashlib.sha256(session_id).hexdigest()
+        # try:
+        #     session = client._sock
+        #     if session:
+        #         tls_session = session.session
+        #         session_id = client._sock.session.id  # type: bytes
+        #         session_hash = hashlib.sha256(session_id).hexdigest()
 
-                print(f"🔐 TLS Session ID: {tls_session.id.hex()}")
-                print(f"🔐 TLS Session ID: {session_id}     ID Hash: {session_hash}")
-        except Exception as e:
-            print(f"⚠️ Failed to retrieve session ID: {e}")
+        #         print(f"🔐 TLS Session ID: {tls_session.id.hex()}")
+        #         print(f"🔐 TLS Session ID: {session_id}     ID Hash: {session_hash}")
+        # except Exception as e:
+        #     print(f"⚠️ Failed to retrieve session ID: {e}")
 
     def on_message(self, client, userdata, msg):
         if verify_signature(msg.payload):
@@ -162,14 +162,14 @@ class FileChangeHandler(FileSystemEventHandler):
 
             
 
-def configure_tls(client, ca_cert, client_cert, client_key):
-    client.tls_set(
-        ca_certs= ca_cert,
-        certfile= client_cert,
-        keyfile= client_key,
-        tls_version=ssl.PROTOCOL_TLSv1_2
-    )
-    client.tls_insecure_set(False)
+# def configure_tls(client, ca_cert, client_cert, client_key):
+#     client.tls_set(
+#         ca_certs= ca_cert,
+#         certfile= client_cert,
+#         keyfile= client_key,
+#         tls_version=ssl.PROTOCOL_TLSv1_2
+#     )
+#     client.tls_insecure_set(False)
 
 # 사용 예시
 if __name__ == "__main__":
@@ -184,7 +184,7 @@ if __name__ == "__main__":
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
         print(f"✅ File saved at: {filepath} ({os.path.getsize(filepath)} bytes)")
-        return {"url": f"http://192.168.86.115:5000/download/{file.filename}"}, 200
+        return {"url": f"http://192.168.0.114:5000/download/{file.filename}"}, 200
 
     @app.route('/download/<filename>', methods=['GET'])
     def download_file(filename):
@@ -198,8 +198,8 @@ if __name__ == "__main__":
     server_thread.start()
 
     # MQTT 설정
-    MQTT_BROKER = "192.168.86.37"  # 또는 MQTT 서버 IP
-    MQTT_PORT = 8883
+    MQTT_BROKER = "192.168.0.103"  # 또는 MQTT 서버 IP
+    MQTT_PORT = 1883
 
     # 감시할 디렉토리 설정
     WATCH_DIR = "../Image_Repo"  # 감시할 폴더 경로 변경 필요

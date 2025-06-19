@@ -1,8 +1,26 @@
 {
     "VIN": "a65sef146m58",
     "version": "9.9.9",
-    "IC_someip": {},
-    "Head_Unit_app": {},
-    "timestamp": "2025-06-16T18:20:49.131396+00:00",
-    "signature": "wlyYbv3jnOz1lsk0eooQBO3cq8HbXru4jTDEtMGBBWPEi9PgWAxzFFNjNyqWsEOEgyXpVSj8NX6MdnicbPjrXp/S5sNCJqSxwbi1xCt/ma+E+yvsxhcWTtNAYmyQ8Tm1"
+    "Head_Unit_app": {
+        "libHead_Unit_app-someip.so": {
+            "path": "build/libHead_Unit_app-someip.so",
+            "version": "0.0.0"
+        },
+        "Head_Unit_app": {
+            "path": "build/Head_Unit_app",
+            "version": "0.0.0"
+        }
+    },
+    "IC_someip": {
+        "IC_someip": {
+            "path": "build/IC_someip",
+            "version": "0.0.0"
+        },
+        "libIC_someip-someip.so": {
+            "path": "build/libIC_someip-someip.so",
+            "version": "0.0.0"
+        }
+    },
+    "timestamp": "2025-06-19T07:39:56.235515+00:00",
+    "signature": "0KglTBvY/auTTQbZxVl6cCoeHrNWogWwG0449eoY015Nd4/JPBnvGWk3xDtuWdCxlIBNge1nqJhquubNv84LUFIhwT4o282sgyjGHKxcekzZnH67E/NVk3QddES2szVl"
 }
